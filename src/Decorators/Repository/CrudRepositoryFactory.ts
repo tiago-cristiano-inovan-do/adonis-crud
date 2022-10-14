@@ -6,7 +6,7 @@ import {
 } from '@ioc:AdonisCrud/Crud/Repository'
 //import { instanceToPlain } from 'class-transformer'
 import { QueryBuilder } from '../../QueryBuilder/QueryBuilder'
-const CrudActions = [{ key: 'index', value: 'index' }]
+import { CrudActions } from '../../Util/CrudActions'
 
 export class CrudRepositoryFactory<Model extends LucidModel>
   implements CrudRepositoryInterface<Model>
@@ -41,5 +41,11 @@ export class CrudRepositoryFactory<Model extends LucidModel>
 
     const paginatedItems = await query.paginate(page, perPage)
     return paginatedItems
+  }
+
+  public async store(propsToStore): Promise<InstanceType<Model>> {
+    const newModel = await this.options.model.create(propsToStore)
+    console.log(this.options.event)
+    return newModel
   }
 }

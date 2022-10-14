@@ -27,9 +27,9 @@ declare module '@ioc:AdonisCrud/Crud/Controller' {
     options: OptionsCrud<Model>
     index?(ctx: HttpContextContract): Promise<IndexReturnInterface<Model>>
     show?(ctx: HttpContextContract): Promise<Model>
-    create?(ctx: HttpContextContract): Promise<Model>
+    store?(ctx: HttpContextContract)
     bulkCreate?(ctx: HttpContextContract): Promise<Model>
-    update?(ctx: HttpContextContract): Promise<Model[]>
+    update?(ctx: HttpContextContract)
     bulkUpdate?(ctx: HttpContextContract): Promise<Model[]>
     delete?(ctx: HttpContextContract): Promise<Model>
     bulckdelete?(ctx: HttpContextContract): Promise<Model>

@@ -1,5 +1,5 @@
 declare module '@ioc:AdonisCrud/Crud/Repository' {
-  import { LucidModel } from '@ioc:Adonis/Lucid/Orm'
+  import { LucidModel, ModelAttributes } from '@ioc:Adonis/Lucid/Orm'
   export interface OptionsCrudRepository<Model extends LucidModel> {
     model: Model
     selectFields?: Array<string>
@@ -33,7 +33,7 @@ declare module '@ioc:AdonisCrud/Crud/Repository' {
   export interface CrudRepositoryInterface<Model> {
     index?({ qs }: IndexRequest)
     show?({ qs }): Promise<ShowResponseInterface<Model>>
-    store?(propToUpdate: Partial<Model>): Promise<Model>
+    store(propsToStore): Promise<InstanceType<any>>
     bulkStore?(propToUpdate: Partial<Model[]>): Promise<Model[]>
     update?(id: string, propToUpdate: Partial<Model>): Promise<Model>
     bulkUpdate?(itensToUpdat: Partial<Model[]>): Promise<Model[]>

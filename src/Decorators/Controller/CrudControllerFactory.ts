@@ -1,10 +1,10 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { OptionsCrud } from '@ioc:AdonisCrud/Crud/Controller'
+import { CrudControllerInterface, OptionsCrud } from '@ioc:AdonisCrud/Crud/Controller'
+import { CrudActions } from '../../Util/CrudActions'
 
-const CrudActions = [{ key: 'index', value: 'index' }]
-
-export class CrudControllerFactory<Model> {
+export class CrudControllerFactory<Model> implements CrudControllerInterface<Model> {
   public options: OptionsCrud<Model>
+  protected errorsRequest = []
   constructor(protected target: any, options: OptionsCrud<Model>) {
     this.options = options
     this.targetProto['options'] = options
@@ -24,8 +24,6 @@ export class CrudControllerFactory<Model> {
   public async index(ctx: HttpContextContract) {
     const { transform } = ctx
     const qs = ctx.request.qs()
-    console.log(this.options)
-    //@ts-ignore
     const list = await this.options.repository.index({ qs })
 
     if (qs.all) {
@@ -55,5 +53,27 @@ export class CrudControllerFactory<Model> {
       pagination,
       data: await transform.withContext(ctx).collection(data, this.options.transformer),
     }
+  }
+
+  public async save(ctx: HttpContextContract, method, statusReturn, body: any) {
+    const hasValidator = this?.options?.validators && this?.options?.validators[method]
+    if (hasValidator) {
+      const validRequest = await ctx.request.validate(this.options.validators[method])
+      if (!validRequest) {
+        return ctx.response.badRequest(this.errorsRequest)
+      }
+    }
+    const newObject = await this.options.repository[method](body)
+    return ctx.response.status(statusReturn).json(newObject)
+  }
+
+  public async store(ctx: HttpContextContract) {
+    const body = ctx.request.only(this.options.storeProps)
+    return this.save(ctx, 'store', 201, body)
+  }
+
+  public async update(ctx: HttpContextContract) {
+    const body = ctx.request.only(this.options.updateProps)
+    return this.save(ctx, 'update', 200, body)
   }
 }
