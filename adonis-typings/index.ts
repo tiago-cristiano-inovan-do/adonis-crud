@@ -1,1 +1,2 @@
-/// <reference path="./skeleton.ts" />
+/// <reference path="./controller.ts" />
+/// <reference path="./repository.ts" />
