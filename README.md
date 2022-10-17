@@ -136,7 +136,7 @@ Property |  Description    | Required?|
 **repository**  | Repository used to deal with your model data.| &#9745;
 **storeProps**  | Allow properties to create your model.     | &#9745;
 **updateProps** | Allow properties to update your model.|
-**transformer** | Array of fields to be used in select | &#9745;
+**transformer** | Adonis bublebee class to trasform data | &#9745;
 **validators**  | [Validator class](https://docs.adonisjs.com/guides/validator/introduction#validator-classes) for each method used to store and update ] |&#9744;
 
 > If a not allowed param is provide in store or update request a exception will be returned.
