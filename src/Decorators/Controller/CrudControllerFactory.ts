@@ -55,6 +55,11 @@ export class CrudControllerFactory<Model> implements CrudControllerInterface<Mod
     }
   }
 
+  public async show(ctx: HttpContextContract) {
+    const list = await this.options.repository.show({ qs: ctx.request.qs() })
+    console.log(list)
+  }
+
   public async save(ctx: HttpContextContract, method, statusReturn, body: any) {
     const hasValidator = this?.options?.validators && this?.options?.validators[method]
     if (hasValidator) {

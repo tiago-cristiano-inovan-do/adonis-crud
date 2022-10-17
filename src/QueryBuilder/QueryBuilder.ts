@@ -9,6 +9,11 @@ interface QueryBuild {
 
 const keysToIgnorePagination = ['page', 'perPage', 'all']
 
+// const makeQs = ({ qs }) => {
+//   const onlyAllowSelectFields = qs
+//   return onlyAllowSelectFields
+// }
+
 export class QueryBuilder {
   public static build({ model, qs }: QueryBuild) {
     const modelQuery: LucidModel = model

@@ -33,6 +33,7 @@ export class CrudRepositoryFactory<Model extends LucidModel>
       qs: rest,
       selectFields: this.options.selectFields || [],
     })
+
     if (all) {
       const allItems = await query.exec()
       console.log({ allItems })
