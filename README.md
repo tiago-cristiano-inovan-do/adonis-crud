@@ -1,7 +1,7 @@
 # adonis-crud
 
 
-<p>Advanced abstration to use with Adonis Framework.<p>
+<p>Advanced abstraction to use with Adonis Framework.<p>
 
 # Installation
 
@@ -11,8 +11,7 @@ npm install adonis-crud
 ```
 
 ## Config package
-  - Configure the package using `node ace configure adonis-crud`. This should update your `.adonisrc.json` file and **tsconfig.json** file.
-
+  - Configure the package using `node ace configure adonis-crud`. This should update your `.adonisrc.json` file and `tsconfig.json` file.
 
 
 ## Create the route for the resource
@@ -20,6 +19,31 @@ npm install adonis-crud
 - in **routes.ts** add
 ```ts
 Route.resource('/posts', 'PostController')
+```
+
+
+### Create the migration to the model
+```ts
+import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+export default class extends BaseSchema {
+  protected tableName = 'posts'
+
+  public async up() {
+    this.schema.createTable(this.tableName, (table) => {
+      table.increments('id')
+      table.string('title').notNullable()
+      table.string('content').notNullable()
+      table.boolean('status').defaultTo(true)
+      table.timestamp('created_at', { useTz: true })
+      table.timestamp('updated_at', { useTz: true })
+    })
+  }
+
+  public async down() {
+    this.schema.dropTable(this.tableName)
+  }
+}
+
 ```
 
 ## Create the model to persist data to the database.
