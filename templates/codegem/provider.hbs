@@ -1,0 +1,26 @@
+import { ApplicationContract } from '@ioc:Adonis/Core/Application'
+
+export default class {{pascalCase repositoryName}}Provider {
+  constructor(protected app: ApplicationContract) {}
+
+  public async register() {
+    const {{repositoryName}} = (await import('App/Repositories/{{repositoryName}}')).default
+    const {{pascalCase modelName}} = (await import('App/Models/{{pascalCase modelName}}')).default
+    return this.app.container.bind(
+      '{{repositoryName}}',
+      () => new {{pascalCase repositoryName}}({ model: {{pascalCase modelName}} })
+    )
+  }
+
+  public async boot() {
+    // All bindings are ready, feel free to use them
+  }
+
+  public async ready() {
+    // App is ready
+  }
+
+  public async shutdown() {
+    // Cleanup, since app is going down
+  }
+}

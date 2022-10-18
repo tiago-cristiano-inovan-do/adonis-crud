@@ -1,0 +1,5 @@
+public async include{{pascalCase modelB}}(model) {
+    return this.item(model.related('{{modelAAtt}}').query().first(), {{modelBTransformer}})
+}
+
+// generator_add_include

@@ -1,0 +1,28 @@
+import { TransformerAbstract } from '@ioc:Adonis/Addons/Bumblebee'
+// generator_import_transformer
+export default class {{transformerName}} extends TransformerAbstract {
+
+  public defaultInclude = ['generator_default_include']
+  public availableInclude = ['generator_avaliable_include']
+
+  public transform(model) {
+    return {
+     id:model.id,
+     createdAt: model.createdAt,
+     updatedAt:model.updatedAt,
+     status:model.status,
+     {{#each tableFields}}
+          {{#if returnTransform}}
+             {{this.name}}:model.{{this.name}},
+          {{/if}}
+      {{/each}}
+
+    }
+  }
+
+  public async includeGeneratorDefaultInclude() {
+    return 'genereted_code_just_ignore'
+  }
+
+  // generator_add_include
+}

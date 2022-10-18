@@ -1,0 +1,26 @@
+import { DateTime } from 'luxon'
+import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import {{pascalCase filterName}} from 'App/Models/Filters/{{filterName}}'
+import { filterable } from '@ioc:Adonis/Addons/LucidFilter'
+@filterable({{pascalCase filterName}})
+export default class {{pascalCase modelName}} extends BaseModel {
+  @column({ isPrimary: true })
+  public id: string
+
+  @column.dateTime({ autoCreate: true })
+  public createdAt: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  public updatedAt: DateTime
+
+  @column()
+  public status: boolean
+
+  {{#each tableFields}}
+
+    @column()
+    public {{this.name}}: {{this.type}}
+  {{/each}}
+
+  // generator_relationship_model
+}

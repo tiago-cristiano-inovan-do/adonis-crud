@@ -1,0 +1,5 @@
+{{columName}}: schema.string({}, [
+      rules.uuid(),
+      rules.exists({ table: '{{modelBTable}}', column: 'id' }),
+]),
+// generator_validator

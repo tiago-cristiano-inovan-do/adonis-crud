@@ -1,0 +1,9 @@
+public {{snakeCase modelAAtt}}({{ snakeCase modelAAtt}}_id: string) {
+  this.$query.where('{{snakeCase modelAAtt}}_id', {{snakeCase modelAAtt}}_id)
+}
+
+public in{{pascalCase modelAAtt}}(in_{{snakeCase modelAAtt}}: []) {
+  this.$query.whereIn('{{snakeCase modelAAtt}}_id', [in_{{snakeCase modelAAtt}}])
+}
+
+// generator relationship filter

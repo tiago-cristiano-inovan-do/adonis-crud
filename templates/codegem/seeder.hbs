@@ -1,0 +1,16 @@
+import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
+import {{pascalCase modelName}} from 'App/Models/{{pascalCase modelName}}'
+export default class {{pascalCase modelName}}Seeder extends BaseSeeder {
+  public async run() {
+    const uniqueKey = '{{seeds.uniqueKey}}'
+
+    const itens = [ {{#each seeds.items}}
+                      {
+                      {{#each this}}
+                        {{@key}}:'{{this}}',
+                      {{/each}}
+                     },
+                  {{/each}} ];
+    await {{pascalCase modelName}}.updateOrCreateMany(uniqueKey,itens)
+  }
+}

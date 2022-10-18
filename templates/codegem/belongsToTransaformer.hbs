@@ -1,0 +1,5 @@
+@belongsTo(() => {{pascalCase modelB}}, {
+  foreignKey: '{{snakeCase columName}}',
+})
+public {{pascalCase modelAAtt}}: BelongsTo<typeof {{pascalCase modelB}}>
+// generator relationship

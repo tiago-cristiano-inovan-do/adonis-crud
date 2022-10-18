@@ -7,7 +7,7 @@
     "mrm": "mrm --preset=@adonisjs/mrm-preset",
     "pretest": "npm run lint",
     "clean": "del-cli build",
-    "copyfiles": "copyfiles \"templates/**/*.txt\" \"instructions.md\" build",
+    "copyfiles": "copyfiles \"templates/**/*.*\" \"instructions.md\" build",
     "compile": "npm run lint && npm run clean && tsc && npm run copyfiles",
     "build": "npm run compile",
     "prepublishOnly": "npm run build",
@@ -48,14 +48,17 @@
     "eslint-plugin-prettier": "^4.2.1",
     "github-label-sync": "^2.2.0",
     "husky": "^8.0.1",
+    "inquirer-file-tree-selection-prompt": "^2.0.5",
     "mrm": "^4.0.0",
     "np": "^7.6.2",
+    "plop": "^3.1.1",
     "prettier": "^2.7.1",
     "typescript": "^4.7.4"
   },
   "peerDependencies": {
     "@adonisjs/core": "^5.8.4",
-    "@adonisjs/lucid": "^18.1.1"
+    "@adonisjs/lucid": "^18.1.1",
+    "plop": "^3.1.1"
   },
   "mrmConfig": {
     "core": false,
@@ -66,12 +69,7 @@
   },
   "types": "build/adonis-typings/index.d.ts",
   "files": [
-    "build/adonis-typings",
-    "build/src",
-    "build/providers",
-    "build/templates",
-    "build/instructions.js",
-    "build/instructions.md"
+    "build/**/*"
   ],
   "eslintConfig": {
     "extends": [
@@ -121,27 +119,25 @@
     "providers": [
       "adonis-crud"
     ],
-   "types": "adonis-crud",
-   "templates": {
+    "types": "adonis-crud",
+    "templates": {
       "basePath": "./build/templates",
-			"config": [
-				{
-					"src": "config/skeleton.txt",
-					"dest": "skeleton"
-				}
-			],
-			"contracts": [
-				{
-					"src": "contracts/skeleton.txt",
-					"dest": "skeleton"
-				}
-			],
-      "Transformer":[
+      "contracts": [
         {
-					"src": "Transformer/BaseTranformer.txt",
-					"dest": "app/Transformers"
-				}
-      ]
+          "src": "contracts/context.txt",
+          "dest": "contracts"
+        }
+      ],
+      "codegem": {
+        "src": "codegem",
+        "dest": "codegem"
+      }
     }
+  },
+  "dependencies": {
+    "@adonisjs/lucid": "^18.1.1",
+    "adonis-bumblebee-ts": "^1.0.0",
+    "fs-extra": "^10.1.0",
+    "plop": "^3.1.1"
   }
 }
