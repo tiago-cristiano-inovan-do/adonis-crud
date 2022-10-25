@@ -1,6 +1,6 @@
 {
   "name": "adonis-crud",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A crud abstraction for AdonisJs",
   "main": "build/providers/AdonisCrudProvider.js",
   "scripts": {
