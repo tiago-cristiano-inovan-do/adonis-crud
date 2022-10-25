@@ -21,6 +21,6 @@ export default class AdonisCrudProvider {
   public async boot() {
     // IoC container is ready
     const Route = this.app.container.use('Adonis/Core/Route')
-    Route.resource('/config', 'ConfigController').apiOnly()
+    Route.resource('/codegem', 'CodeGemController').apiOnly()
   }
 }

@@ -1,7 +1,7 @@
+
 # adonis-crud
 
-
-<p>Advanced abstraction to use with Adonis Framework.<p>
+Advanced abstraction to use with Adonis Framework
 
 # Installation
 
@@ -11,18 +11,19 @@ npm install adonis-crud
 ```
 
 ## Config package
-  - Configure the package using `node ace configure adonis-crud`. This should update your `.adonisrc.json` file and `tsconfig.json` file.
 
+- Configure the package using `node ace configure adonis-crud`. This should update your `.adonisrc.json` file and `tsconfig.json` file.
 
 ## Create the route for the resource
 
 - in **routes.ts** add
+
 ```ts
 Route.resource('/posts', 'PostController')
 ```
 
-
 ### Create the migration to the model
+
 ```ts
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 export default class extends BaseSchema {
@@ -46,7 +47,8 @@ export default class extends BaseSchema {
 
 ```
 
-## Create the model to persist data to the database.
+## Create the model to persist data to the database
+
 ```bash
   node ace make:model Post
 ```
@@ -78,9 +80,7 @@ export default class Post extends BaseModel {
 }
 ```
 
-
-## Create your repository to deal with your model using the decorator provided.
-
+## Create your repository to deal with your model using the decorator provided
 
 ```ts
 import Event from '@ioc:Adonis/Core/Event'
@@ -97,16 +97,13 @@ export default class PostRepository implements CrudRepositoryInterface<Post> {}
 
 ```
 
-### Crud repository props.
+### Crud repository props
 
 Property |  Description    | Required?|
 ------- | -----------| -----------|
 **event**  | Event emiter from Adonis to be used in hooks features | &#9745;
 **model**  | Model     | &#9745;
 **selectFields** | Array of fields to be used in select | &#9745;
-
-
-
 
 ## Create your transformer
 
@@ -125,9 +122,8 @@ export default class PostTransformer extends TransformerAbstract {
 }
 
 ```
+
 > Here you can format or transform the data, format a date, make a computed property....
-
-
 
 ## Create your controller and use the decorator provided
 
@@ -154,12 +150,11 @@ export default class PostsController<Post> implements CrudControllerInterface<Po
 
 ### Crud decorator options
 
-
 Property |  Description    | Required?|
 ------- | -----------| -----------|
 **repository**  | Repository used to deal with your model data.| &#9745;
 **storeProps**  | Allow properties to create your model.     | &#9745;
-**updateProps** | Allow properties to update your model.|
+**updateProps** | Allow properties to update your model.|&#9745;
 **transformer** | Adonis bublebee class to trasform data | &#9745;
 **validators**  | [Validator class](https://docs.adonisjs.com/guides/validator/introduction#validator-classes) for each method used to store and update ] |&#9744;
 
@@ -167,42 +162,43 @@ Property |  Description    | Required?|
 
 > If a validator object is not provided no validation will be apply to store and update methods.
 
-
-
 ### Features
--  &#9745; Crud Abstraction
--  &#9745; Validators
--  &#9745; Events (on update, on delete, on create)
--  &#9745; Intercept flow and develop your own bussines logic
--  &#9745; Apply Scoped Queries
--  &#9745; Tranformer with includes (join relationship automagically). Thanks to [adonis-bublebee-ts](https://github.com/kmorpex/adonis-bublebee-ts).
--  &#9745; Generate report csv/ pdf.
-- Acl based on Adonis ACL
 
-
+- &#9745; Crud Abstraction
+- &#9745; Validators
+- &#9745; Events (on update, on delete, on create)
+- &#9745; Intercept flow and develop your own bussines logic
+- &#9745; Apply Scoped Queries
+- &#9745; Tranformer with includes (join relationship automagically). Thanks to [adonis-bublebee-ts](https://github.com/kmorpex/adonis-bublebee-ts).
+- &#9745; Generate report csv/ pdf.
+- &#9745; Acl based on Adonis ACL
 
 ### **C**reate
- - Validate data to create based on Adonis Validators.
- - Bulk Insert
 
- ### **R**ead
-  - Default pagination
-  - Feature includes (add relationship to return data)
-  - Query builder from request params
-  - Feature All (get all itens)
-  - Configurable select fields
-  - Configurable order 
-  - Configurable
+- Validate data to create based on Adonis Validators.
+- Bulk Insert
+
+### **R**ead
+
+- Default pagination
+- Feature includes (add relationship to return data)
+- Query builder from request params
+- Feature All (get all itens)
+- Configurable select fields
+- Configurable order
+- Configurable
 
 ### **U**pdate
-   - Validate update props based on adonis validators
-   - Bulk update
+
+- Validate update props based on adonis validators
+- Bulk update
 
 ### **D**elete
- - Default soft delete strategy
- - Bulk delete
 
+- Default soft delete strategy
+- Bulk delete
 
 ### Dependencies
+
 - [Adonis ACL](https://github.com/shagital/adonisjs-acl) for role and permission management
 - [Adonis Bublebee ts](https://github.com/kmorpex/adonis-bublebee-ts) for tranform and include data to response.
