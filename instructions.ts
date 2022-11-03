@@ -22,14 +22,20 @@ const copyFolderToProjetct = ({ pathDestiny, folder }) => {
 
 export default async function instructions(projectRoot: string) {
   console.log('Coping Transformers')
-  const transformerPath = `${projectRoot}/app/Transformer`
-  copyFolderToProjetct({ pathDestiny: transformerPath, folder: 'Tranformers' })
+  const transformerPath = `${projectRoot}/app/Transformers`
+  copyFolderToProjetct({ pathDestiny: transformerPath, folder: 'Transformers' })
 
-  // Coby Models
-  console.log('Coping BaseCrudModel')
-  console.log('Creating Models folder if not exist')
+  console.log('Coping Repository')
+  const RepositoryPath = `${projectRoot}/app/Repositories`
+  copyFolderToProjetct({ pathDestiny: RepositoryPath, folder: 'Repositories' })
+
+  console.log('Coping Models')
   const modelPath = `${projectRoot}/app/Models`
   copyFolderToProjetct({ pathDestiny: modelPath, folder: 'Models' })
+
+  console.log('Coping Controller')
+  const controllerPath = `${projectRoot}/app/Controllers/Http`
+  copyFolderToProjetct({ pathDestiny: controllerPath, folder: 'Controllers' })
 
   // Coby Controllers
   // console.log('Coping Controllers')
