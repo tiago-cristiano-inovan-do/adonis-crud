@@ -7,7 +7,6 @@ export default class AdonisCrudProvider {
   public async register() {
     const CrudControllerDecorator = await import('../src/Decorators/Controller/CrudDecorator')
     const CrudRepositoryDecorator = await import('../src/Decorators/Repository/CrudRepository')
-    console.log({ CrudRepositoryDecorator })
 
     this.app.container.bind('AdonisCrud/Crud/Controller', () => {
       return CrudControllerDecorator
@@ -16,11 +15,30 @@ export default class AdonisCrudProvider {
     this.app.container.bind('AdonisCrud/Crud/Repository', () => {
       return CrudRepositoryDecorator
     })
+
+    this.app.container.bind('App/Repositories/UserRepository', () => {
+      return CrudRepositoryDecorator
+    })
+
+    this.app.container.bind('App/Repositories/AuthRepository', () => {
+      return CrudRepositoryDecorator
+    })
   }
 
   public async boot() {
-    // IoC container is ready
     const Route = this.app.container.use('Adonis/Core/Route')
     Route.resource('/codegem', 'CodeGemController').apiOnly()
+    Route.post('/auth/register', 'UserController.store').middleware('auth')
+    Route.post('/auth/login', 'AuthController.login')
+    Route.post('/auth/reset-password', 'AuthController.resetPassword')
+    Route.get('/auth/me', 'AuthController.me').middleware('auth')
+
+    Route.group(() => {
+      Route.resource('profiles', 'ProfileController').apiOnly()
+    }).middleware('auth')
+
+    Route.group(() => {
+      Route.resource('users', 'UserController').apiOnly()
+    }).middleware('auth')
   }
 }

@@ -1,0 +1,10 @@
+import Event from '@ioc:Adonis/Core/Event'
+import CrudRepository, { CrudRepositoryInterface } from '@ioc:AdonisCrud/Crud/Repository'
+import User from 'App/Models/User'
+
+@CrudRepository<User>({
+  event: Event,
+  model: User,
+  selectFields: ['id', 'name', 'status'],
+})
+export default class UserRepository implements CrudRepositoryInterface<User> {}

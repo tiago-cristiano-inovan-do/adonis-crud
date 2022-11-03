@@ -1,37 +1,43 @@
 import fs from 'fs'
-import fsExtra from 'fs-extra'
 import path from 'path'
+const packageBasePath = path.resolve(`${__dirname}/templates`)
+
+const copyFolderToProjetct = ({ pathDestiny, folder }) => {
+  const capitalizedFolder = folder[0].toUpperCase() + folder.slice(1)
+
+  if (!fs.existsSync(pathDestiny)) {
+    fs.mkdirSync(pathDestiny, { recursive: true })
+  }
+  console.log('Coping models to project folder...')
+
+  fs.readdirSync(`${packageBasePath}/${capitalizedFolder}`).forEach((file) => {
+    const [fileName, extension] = file.split('.')
+    fs.copyFileSync(
+      `${packageBasePath}/${capitalizedFolder}/${fileName}.${extension}`,
+      `${pathDestiny}/${fileName}.ts`,
+      fs.constants.COPYFILE_FICLONE
+    )
+  })
+}
 
 export default async function instructions(projectRoot: string) {
-  const packageBasePath = path.resolve(`${__dirname}/templates`)
+  console.log('Coping Transformers')
+  const transformerPath = `${projectRoot}/app/Transformer`
+  copyFolderToProjetct({ pathDestiny: transformerPath, folder: 'Tranformers' })
 
-  // Copy BaseTransformer
-  const transformerPath = `${projectRoot}/app/Transformers`
-  if (!fs.existsSync(transformerPath)) {
-    fs.mkdirSync(transformerPath, { recursive: true })
-  }
-
-  fs.copyFileSync(
-    `${packageBasePath}/Transformer/BaseTransformer.txt`,
-    `${transformerPath}/BaseTransformer.ts`,
-    fs.constants.COPYFILE_FICLONE
-  )
-
-  // Coby BaseCrudModel
+  // Coby Models
+  console.log('Coping BaseCrudModel')
+  console.log('Creating Models folder if not exist')
   const modelPath = `${projectRoot}/app/Models`
-  if (!fs.existsSync(modelPath)) {
-    fs.mkdirSync(modelPath, { recursive: true })
-  }
+  copyFolderToProjetct({ pathDestiny: modelPath, folder: 'Models' })
 
-  fs.copyFileSync(`${packageBasePath}/Models/BaseCrudModel.txt`, `${modelPath}/BaseCrudModel.ts`)
-
-  // Copy CodeGen
-  const codeGemPath = `${projectRoot}/codegem`
-  console.log({ codeGemPath, packageBasePath })
-  if (!fs.existsSync(codeGemPath)) {
-    fs.mkdirSync(codeGemPath, { recursive: true })
-  }
-  fsExtra.copy(`${packageBasePath}/codegem`, codeGemPath)
+  // Coby Controllers
+  // console.log('Coping Controllers')
+  // const controllersPath = `${projectRoot}/app/Controllers/Http`
+  // console.log({ controllersPath, projectRoot })
+  // if (!fs.existsSync(controllersPath)) {
+  //   fs.mkdirSync(modelPath, { recursive: true })
+  // }
 
   // // 3. Copy models
   // const modelPath = `${projectRoot}/app/Models`

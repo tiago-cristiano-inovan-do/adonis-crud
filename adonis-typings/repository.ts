@@ -27,13 +27,13 @@ declare module '@ioc:AdonisCrud/Crud/Repository' {
 
   export interface IndexRequest {
     qs: QsRequest
-    auth?: any
+    authUser?: any
   }
 
   export interface CrudRepositoryInterface<Model> {
     index?({ qs }: IndexRequest)
-    show?({ qs }): Promise<ShowResponseInterface<Model>>
-    store(propsToStore): Promise<InstanceType<any>>
+    show?({ id })
+    store?(propsToStore): Promise<InstanceType<any>>
     bulkStore?(propToUpdate: Partial<Model[]>): Promise<Model[]>
     update?(id: string, propToUpdate: Partial<Model>): Promise<Model>
     bulkUpdate?(itensToUpdat: Partial<Model[]>): Promise<Model[]>

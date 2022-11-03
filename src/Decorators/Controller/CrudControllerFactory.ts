@@ -5,6 +5,10 @@ import { CrudActions } from '../../Util/CrudActions'
 export class CrudControllerFactory<Model> implements CrudControllerInterface<Model> {
   public options: OptionsCrud<Model>
   protected errorsRequest = []
+  protected authMethods = {
+    index: true,
+    show: true,
+  }
   constructor(protected target: any, options: OptionsCrud<Model>) {
     this.options = options
     this.targetProto['options'] = options
@@ -23,8 +27,12 @@ export class CrudControllerFactory<Model> implements CrudControllerInterface<Mod
 
   public async index(ctx: HttpContextContract) {
     const { transform } = ctx
+    let authUser = null
+    if (this.authMethods['index']) {
+      authUser = ctx.auth.use('api').user
+    }
     const qs = ctx.request.qs()
-    const list = await this.options.repository.index({ qs })
+    const list = await this.options.repository.index({ qs, authUser })
 
     if (qs.all) {
       const pagination = {
@@ -56,11 +64,11 @@ export class CrudControllerFactory<Model> implements CrudControllerInterface<Mod
   }
 
   public async show(ctx: HttpContextContract) {
-    const list = await this.options.repository.show({ qs: ctx.request.qs() })
-    console.log(list)
+    const { id } = ctx.params
+    return this.options.repository.show({ id })
   }
 
-  public async save(ctx: HttpContextContract, method, statusReturn, body: any) {
+  public async save(ctx: HttpContextContract, method: string, statusReturn: number, body: any) {
     const hasValidator = this?.options?.validators && this?.options?.validators[method]
     if (hasValidator) {
       const validRequest = await ctx.request.validate(this.options.validators[method])
@@ -80,5 +88,9 @@ export class CrudControllerFactory<Model> implements CrudControllerInterface<Mod
   public async update(ctx: HttpContextContract) {
     const body = ctx.request.only(this.options.updateProps)
     return this.save(ctx, 'update', 200, body)
+  }
+
+  public async destroy(ctx: HttpContextContract) {
+    return this.options.repository.destroy({ id: ctx.params.id })
   }
 }
