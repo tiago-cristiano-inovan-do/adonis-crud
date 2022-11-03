@@ -13,12 +13,17 @@ export class CrudControllerFactory<Model> implements CrudControllerInterface<Mod
     this.options = options
     this.targetProto['options'] = options
     this.setMethods()
+    this.setDefaultProps()
   }
 
   private setMethods() {
     for (const action of CrudActions) {
       this.targetProto[action.key] = this[`${action.value}`]
     }
+  }
+
+  private setDefaultProps() {
+    this.targetProto['authMethods'] = this.authMethods
   }
 
   protected get targetProto(): any {
@@ -28,6 +33,7 @@ export class CrudControllerFactory<Model> implements CrudControllerInterface<Mod
   public async index(ctx: HttpContextContract) {
     const { transform } = ctx
     let authUser = null
+    console.log(this.authMethods, this.options)
     if (this.authMethods['index']) {
       authUser = ctx.auth.use('api').user
     }
@@ -76,6 +82,7 @@ export class CrudControllerFactory<Model> implements CrudControllerInterface<Mod
         return ctx.response.badRequest(this.errorsRequest)
       }
     }
+    console.log(this.options.repository)
     const newObject = await this.options.repository[method](body)
     return ctx.response.status(statusReturn).json(newObject)
   }

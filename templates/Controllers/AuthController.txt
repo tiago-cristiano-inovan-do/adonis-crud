@@ -1,13 +1,14 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Crud, { OptionsCrud } from '@ioc:AdonisCrud/Crud/Controller'
-import AuthRepository from '@ioc:App/Repositories/AuthRepository'
-import BaseTranformer from 'App/Transformers/BaseTranformer'
+import AuthRepository from '@ioc:AuthRepository'
+import BaseTransformer from 'App/Transformers/BaseTransformer'
 import User from 'App/Models/User'
+import { Response } from '@adonisjs/core/build/standalone'
 @Crud<User>({
   repository: AuthRepository,
-  storeProps: [],
+  storeProps: ['email', 'password', 'name'],
   updateProps: [],
-  transformer: BaseTranformer,
+  transformer: BaseTransformer,
 })
 export default class AuthController<User> {
   options: OptionsCrud<User>
@@ -20,10 +21,18 @@ export default class AuthController<User> {
   }
 
   public async login(ctx: HttpContextContract) {
-    return this.options.repository.login(ctx)
+    const { auth, request, response } = ctx
+    const email = request.input('email')
+    const password = request.input('password')
+    try {
+      return this.options.repository.login({ email, password, auth })
+    } catch (error) {
+      return response.status(401).json({ message: error.message })
+    }
   }
 
   public async me(ctx) {
-    return this.options.repository.me(ctx)
+    const { user } = ctx.auth
+    return this.options.repository.me({ user })
   }
 }

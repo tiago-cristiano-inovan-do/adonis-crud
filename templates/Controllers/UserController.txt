@@ -1,0 +1,15 @@
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Crud, { OptionsCrud } from '@ioc:AdonisCrud/Crud/Controller'
+import AuthRepository from '@ioc:AuthRepository'
+import BaseTransformer from 'App/Transformers/BaseTransformer'
+import User from 'App/Models/User'
+import { Response } from '@adonisjs/core/build/standalone'
+@Crud<User>({
+  repository: AuthRepository,
+  storeProps: ['email', 'password', 'name'],
+  updateProps: [],
+  transformer: BaseTransformer,
+})
+export default class UserController<User> {
+  options: OptionsCrud<User>
+}

@@ -24,13 +24,22 @@ npm install adonis-crud
 
 As informed here [Adonis DataBase Introduction](https://docs.adonisjs.com/guides/database/introduction)
 
-
 ## Install Auth
+
 As informed here [Adonis Auth Introduction](https://docs.adonisjs.com/guides/auth/introduction)
 
 ![auth install orientation](/docs/Auth.png "Answer this questions").
 
+Also install the hash dependencie
+[available-hashers](https://docs.adonisjs.com/guides/security/hashing#available-hashers)
 
+```bash
+npm i phc-argon2
+```
+
+## Install Adonis Bumblebee
+
+As informed here [Bumblebee Documentation](https://github.com/kmorpex/adonis-bublebee-ts)
 
 ## Configure package
 
@@ -38,7 +47,7 @@ As informed here [Adonis Auth Introduction](https://docs.adonisjs.com/guides/aut
 node ace configure adonis-crud
 ```
 
-This should update your `.adonisrc.json`, `tsconfig.json` and add a list of other files. [File Genereted](#filegenerated)
+This should update your `.adonisrc.json`, `tsconfig.json` and add a list of other files: [File Genereted](#file-generated-by-adonis-crud)
 
 ## Create the route for the resource
 
@@ -71,6 +80,20 @@ export default class extends BaseSchema {
   }
 }
 
+```
+
+## Migration and seeders
+
+>Create database initial structure
+
+```bash
+  node ace migration:run
+```
+
+>Seeds Initial Data
+
+```bash
+  node ace make:model Post
 ```
 
 ## Create the model to persist data to the database

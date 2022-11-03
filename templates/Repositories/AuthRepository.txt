@@ -1,10 +1,39 @@
 import Event from '@ioc:Adonis/Core/Event'
-import CrudRepository, { CrudRepositoryInterface } from '@ioc:AdonisCrud/Crud/Repository'
+import CrudRepository, {
+  CrudRepositoryInterface,
+  OptionsCrudRepository,
+} from '@ioc:AdonisCrud/Crud/Repository'
 import User from 'App/Models/User'
 
-@CrudRepository<User>({
+@CrudRepository<typeof User>({
   event: Event,
   model: User,
   selectFields: ['id', 'name', 'status'],
 })
-export default class AuthRepository implements CrudRepositoryInterface<User> {}
+export default class AuthRepository {
+  public options: OptionsCrudRepository<typeof User>
+  public async login({ email, password, auth }) {
+    await this.checkUserActive({ email })
+    const token = await auth.use('api').attempt(email, password)
+    return token
+  }
+
+  private async checkUserActive({ email }) {
+    const user = await this.options.model.findBy('email', email)
+    console.log(user?.status)
+    if (user?.status) {
+      throw new Error('Inative Users cant login')
+    }
+  }
+
+  public async me({ user }) {
+    const fullUser = await this.options.model
+      .query()
+      .preload('profiles')
+      .where('id', user.id)
+      .first()
+
+    console.log('fullUser :', fullUser)
+    return fullUser
+  }
+}

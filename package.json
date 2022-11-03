@@ -117,7 +117,9 @@
     "instructions": "./build/instructions.js",
     "instructionsMd": "./build/instructions.md",
     "providers": [
-      "adonis-crud"
+      "adonis-crud",
+      "./providers/AuthRepositoryProvider",
+      "./providers/UserRepositoryProvider"
     ],
     "types": "adonis-crud",
     "templates": {
@@ -127,11 +129,7 @@
           "src": "contracts/context.txt",
           "dest": "contracts"
         }
-      ],
-      "codegem": {
-        "src": "codegem",
-        "dest": "codegem"
-      }
+      ]
     }
   },
   "dependencies": {
