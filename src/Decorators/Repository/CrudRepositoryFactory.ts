@@ -43,8 +43,7 @@ export class CrudRepositoryFactory<Model extends LucidModel>
     })
 
     if (all) {
-      const allItems = await query.exec()
-      return allItems
+      return query.exec()
     }
 
     const paginatedItems = await query.paginate(page, perPage)
@@ -52,8 +51,7 @@ export class CrudRepositoryFactory<Model extends LucidModel>
   }
 
   public async show({ id }) {
-    const item = await this.getActiveRecord(id)
-    return item
+    return this.getActiveRecord(id)
   }
 
   public async store(propsToStore): Promise<InstanceType<Model>> {
