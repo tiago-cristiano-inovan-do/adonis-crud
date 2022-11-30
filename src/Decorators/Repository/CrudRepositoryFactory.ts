@@ -55,8 +55,9 @@ export class CrudRepositoryFactory<Model extends LucidModel>
   }
 
   public async store(propsToStore): Promise<InstanceType<Model>> {
-    const newModel = await this.options.model.create(propsToStore)
-    return newModel
+    const model = await this.options.model.create(propsToStore)
+    this.options.event.emit(`new:${model}`, model)
+    return model
   }
 
   protected async getActiveRecord(id: string) {

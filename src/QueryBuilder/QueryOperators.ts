@@ -4,7 +4,7 @@ interface OperatorQueryParam {
   value: any
 }
 
-const Operatos = {
+const Operators = {
   '=': ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, value)
   },
@@ -21,4 +21,4 @@ const Operatos = {
     query.where(`${param}`, '<>', value)
   },
 }
-export { Operatos }
+export { Operators }
