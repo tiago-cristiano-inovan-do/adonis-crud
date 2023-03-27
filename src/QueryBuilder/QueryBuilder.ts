@@ -15,8 +15,8 @@ const keysToIgnorePagination = ['page', 'perPage', 'all']
 // }
 
 export class QueryBuilder {
-  public static build({ model , qs }: QueryBuild) {
-     const query = model.query()
+  public static build({ model, qs }: QueryBuild) {
+    const query = model.query()
 
     for (const key in qs) {
       if (keysToIgnorePagination.includes(key)) continue

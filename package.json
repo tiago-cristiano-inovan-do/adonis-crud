@@ -1,6 +1,6 @@
 {
   "name": "adonis-crud",
-  "version": "0.0.4",
+  "version": "0.0.1",
   "description": "A crud abstraction for AdonisJs",
   "main": "build/providers/AdonisCrudProvider.js",
   "scripts": {
@@ -20,9 +20,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/{owner}/{skeleton}.git"
+    "url": "https://git.inovan.do/inovando/adonis-crud"
   },
-  "homepage": "https://github.com/{owner}/{skeleton}#readme",
+  "homepage": "https://git.inovan.do/inovando/adonis-crud#readme",
   "keywords": [
     "adonisjs",
     "adonis"
@@ -30,7 +30,7 @@
   "author": "Tiago Cristiano Alves",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/{owner}/{skeleton}/issues"
+    "url": "https://git.inovan.do/inovando/adonis-crud/issues"
   },
   "devDependencies": {
     "@adonisjs/core": "^5.8.4",
