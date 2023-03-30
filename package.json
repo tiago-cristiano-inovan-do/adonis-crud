@@ -20,9 +20,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/{owner}/{skeleton}.git"
+    "url": "git+https://github.com/inovando/adonis-crud.git"
   },
-  "homepage": "https://github.com/{owner}/{skeleton}#readme",
+  "homepage": "https://github.com/inovando/adonis-crud#readme",
   "keywords": [
     "adonisjs",
     "adonis"
@@ -30,7 +30,7 @@
   "author": "Tiago Cristiano Alves",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/{owner}/{skeleton}/issues"
+    "url": "https://github.com/inovando/adonis-crud/issues"
   },
   "devDependencies": {
     "@adonisjs/core": "^5.8.4",
