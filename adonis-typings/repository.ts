@@ -4,6 +4,7 @@ declare module '@ioc:AdonisCrud/Crud/Repository' {
     model: Model
     selectFields?: Array<string>
     event: any
+    service: any
   }
 
   export interface IndexResponseInterface<Model> {
