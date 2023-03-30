@@ -16,7 +16,7 @@ export interface IndexRequest {
   authUser?: any
 }
 
-export function CrudRepositoryDecorator<T extends LucidModel>(Model: T): ClassDecorator {
+export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
   return (target) => {
     const functionMap: FunctionMap = {
       async index({
