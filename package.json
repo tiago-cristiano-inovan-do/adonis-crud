@@ -1,5 +1,5 @@
 {
-  "name": "adonis-crud",
+  "name": "@inovan.do/adonis-crud",
   "version": "0.0.1",
   "description": "A crud abstraction for AdonisJs",
   "main": "build/providers/AdonisCrudProvider.js",
@@ -138,5 +138,8 @@
     "adonis-bumblebee-ts": "^1.0.0",
     "fs-extra": "^10.1.0",
     "plop": "^3.1.1"
+  },
+  "directories": {
+    "doc": "docs"
   }
 }
