@@ -14,7 +14,7 @@ Advanced abstraction to use with Adonis Framework
 # Installation
 
 ```bash
-npm install adonis-crud
+npm install @inovan.do/adonis-crud
 
 ```
 

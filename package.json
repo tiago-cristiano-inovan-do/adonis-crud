@@ -118,11 +118,11 @@
     "instructions": "./build/instructions.js",
     "instructionsMd": "./build/instructions.md",
     "providers": [
-      "adonis-crud",
+      "@inovan.do/adonis-crud",
       "./providers/AuthRepositoryProvider",
       "./providers/UserRepositoryProvider"
     ],
-    "types": "adonis-crud",
+    "types": "@inovan.do/adonis-crud",
     "templates": {
       "basePath": "./build/templates",
       "contracts": [
