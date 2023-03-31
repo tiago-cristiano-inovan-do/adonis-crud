@@ -99,6 +99,16 @@ export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
     }
 
     // Assign the CRUD methods to the target class prototype
-    Object.assign(targetPrototype, functionMap)
+
+    Object.assign(targetPrototype, {
+      ...functionMap,
+      model: Model,
+    })
+
+    Object.defineProperty(targetPrototype, 'Model', {
+      value: Model,
+      writable: false,
+      configurable: false,
+    })
   }
 }

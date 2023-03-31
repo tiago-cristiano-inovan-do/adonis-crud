@@ -11,5 +11,7 @@ declare module '@ioc:AdonisCrud/Crud/Controller' {
     event: any
   }
 
-  export default function Crud(options: CrudOperationsOptions): ClassDecorator
+  const Crud: (options: CrudOperationsOptions) => ClassDecorator
+
+  export { Crud }
 }

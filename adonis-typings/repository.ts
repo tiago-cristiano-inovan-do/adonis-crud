@@ -9,5 +9,8 @@ declare module '@ioc:AdonisCrud/Crud/Repository' {
     qs: QsRequest
     authUser?: any
   }
-  export default function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator
+
+  const CrudRepository: <T extends LucidModel>(Model: T) => ClassDecorator
+
+  export { CrudRepository }
 }

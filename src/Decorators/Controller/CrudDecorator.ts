@@ -1,98 +1,86 @@
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-
-export interface CrudOperationsOptions {
-  repository: any
-  transformer: any
-  validators: {
-    store?: any
-    update?: any
-  }
-  storeProps: string[]
-  updateProps: string[]
-  event: any
-}
+import { LucidModel } from '@ioc:Adonis/Lucid/Orm'
+import { QueryBuilder } from '../../QueryBuilder/QueryBuilder'
 
 type FunctionMap = {
-  [key: string]: (ctx: HttpContextContract) => Promise<any>
+  [key: string]: Function
 }
 
-export function Crud(options: CrudOperationsOptions): ClassDecorator {
-  const functionMap: FunctionMap = {
-    async index(ctx) {
-      const { transform } = ctx
-      let authUser = ctx.auth.user
-      const qs = ctx.request.qs()
-      const list = await options.repository.index({ qs, authUser })
-      const pagination = {
-        page: 1,
-        firstPage: 1,
-        lastPage: 1,
-      }
-      return {
-        pagination,
-        data: await transform.withContext(ctx).collection(list, options.transformer),
-      }
-    },
+export type QsRequest = {
+  page: number
+  perPage: number
+  all: boolean
+}
 
-    async show(ctx) {
-      const { params, transform, request } = ctx
-      const queryString = request.qs()
-      let authUser = ctx.auth.user
-      const data = await options.repository.show({
-        id: params.id,
-        authUser,
-        status: queryString.status || true,
-      })
-      return await transform.withContext(ctx).item(data, options.transformer)
-    },
+export interface IndexRequest {
+  qs: QsRequest
+  authUser?: any
+}
 
-    async store(ctx) {
-      const body = ctx.request.only(options.storeProps)
-      const hasValidator = options.validators.store
-      if (hasValidator) {
-        const validRequest = await ctx.request.validate(hasValidator)
-        if (!validRequest) {
-          return ctx.response.badRequest(this.errorsRequest)
-        }
-      }
-      const newObject = await options.repository.store(body)
-      options.event.emit(`new:${newObject.constructor.table}`, newObject)
-      return ctx.response.status(201).json(newObject)
-    },
-
-    async update(ctx) {
-      const { params, transform, request } = ctx
-      const body = request.only(options.updateProps)
-      const { id } = params
-      const hasValidator = options.validators.update
-      if (hasValidator) {
-        const validRequest = await ctx.request.validate(hasValidator)
-        if (!validRequest) {
-          return ctx.response.badRequest(this.errorsRequest)
-        }
-      }
-      const updatedObject = await options.repository.update({ id, body })
-      if (!updatedObject) {
-        return ctx.response.status(404)
-      }
-      const updateOutput = await transform.withContext(ctx).item(updatedObject, options.transformer)
-      return ctx.response.status(200).json(updateOutput)
-    },
-
-    async destroy(ctx) {
-      const { params } = ctx
-      const deleted = await options.repository.destroy(params.id)
-      if (deleted) {
-        return ctx.response.status(204)
-      }
-      return ctx.response.status(404)
-    },
-  }
-
+export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
   return (target) => {
+    const functionMap: FunctionMap = {
+      async index({
+        qs: { page = 1, perPage = 10, all = false, ...rest },
+        authUser,
+      }: IndexRequest) {
+        const query = QueryBuilder.build({
+          model: Model,
+          qs: rest,
+          selectFields: [],
+        })
+
+        await this.applyScopedQuery({
+          query,
+          model: Model,
+          userAuth: authUser,
+        })
+
+        if (all) {
+          return query.exec()
+        }
+
+        const paginatedItems = await query.paginate(page, perPage)
+        return paginatedItems
+      },
+      async show({ id, status }) {
+        return this.getById({ id, status })
+      },
+      async store(propsToStore) {
+        const model = await Model.create(propsToStore)
+        //options.event.emit(`new:${model}`, model)
+        return model
+      },
+      async update({ id, body }) {
+        const modelToUpdate = await this.getById({ id })
+        if (!modelToUpdate) {
+          return false
+        }
+        modelToUpdate.merge(body)
+        return await modelToUpdate.save()
+      },
+      async destroy(id) {
+        const modelToDelete = await this.getById({ id })
+        if (!modelToDelete) return false
+        try {
+          await modelToDelete.delete()
+          return true
+        } catch (error) {
+          return false
+        }
+      },
+      async applyScopedQuery() {
+        console.log('not applying scope')
+      },
+      async getById({ id, status = true }) {
+        const query = Model.query()
+        const model = await query.where('id', id).where('status', status).first()
+        return model
+      },
+    }
+
     const targetPrototype = target.prototype
 
-    // Check if the controller has any of the CRUD methods already defined.
+    // Check if the repository has any of the CRUD methods already defined.
     // If yes, use them instead of the default methods from the decorator.
     if (targetPrototype.index) {
       functionMap.index = targetPrototype.index
@@ -100,17 +88,27 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
     if (targetPrototype.show) {
       functionMap.show = targetPrototype.show
     }
-    if (targetPrototype.create) {
-      functionMap.create = targetPrototype.create
+    if (targetPrototype.store) {
+      functionMap.store = targetPrototype.store
     }
     if (targetPrototype.update) {
       functionMap.update = targetPrototype.update
     }
-    if (targetPrototype.delete) {
-      functionMap.delete = targetPrototype.delete
+    if (targetPrototype.destroy) {
+      functionMap.destroy = targetPrototype.destroy
     }
 
     // Assign the CRUD methods to the target class prototype
-    Object.assign(targetPrototype, functionMap)
+
+    Object.assign(targetPrototype, {
+      ...functionMap,
+      model: Model,
+    })
+
+    Object.defineProperty(targetPrototype, 'Model', {
+      value: Model,
+      writable: false,
+      configurable: false,
+    })
   }
 }
