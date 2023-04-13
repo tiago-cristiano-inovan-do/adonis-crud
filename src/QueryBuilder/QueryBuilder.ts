@@ -7,7 +7,7 @@ interface QueryBuild {
   selectFields: String[]
 }
 
-const keysToIgnorePagination = ['page', 'perPage', 'all']
+const keysToIgnorePagination = ['page', 'perPage', 'all', 'include']
 
 export class QueryBuilder {
   public static build({ model, qs }: QueryBuild) {
