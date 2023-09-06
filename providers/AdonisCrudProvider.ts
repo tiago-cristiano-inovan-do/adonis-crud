@@ -6,18 +6,13 @@ export default class AdonisCrudProvider {
 
   public async register() {
     const CrudControllerDecorator = await import('../src/Decorators/Controller/CrudDecorator')
-    const CrudRepositoryDecorator = await import('../src/Decorators/Repository/CrudRepository')
-
+    const CrudRepository = await import('../src/Decorators/Repository/CrudRepository')
     this.app.container.bind('AdonisCrud/Crud/Controller', () => {
       return CrudControllerDecorator
     })
 
     this.app.container.bind('AdonisCrud/Crud/Repository', () => {
-      return CrudRepositoryDecorator
-    })
-
-    this.app.container.bind('App/Repositories/UserRepository', () => {
-      return CrudRepositoryDecorator
+      return CrudRepository
     })
   }
 

@@ -1,17 +1,10 @@
-import Event from '@ioc:Adonis/Core/Event'
-import CrudRepository, {
-  CrudRepositoryInterface,
-  OptionsCrudRepository,
-} from '@ioc:AdonisCrud/Crud/Repository'
 import User from 'App/Models/User'
 
-@CrudRepository<typeof User>({
-  event: Event,
-  model: User,
-  selectFields: ['id', 'name', 'status'],
-})
 export default class AuthRepository {
-  public options: OptionsCrudRepository<typeof User>
+  public model
+  constructor() {
+    this.model = User
+  }
   public async login({ email, password, auth }) {
     await this.checkUserActive({ email })
     const token = await auth.use('api').attempt(email, password)
@@ -19,19 +12,14 @@ export default class AuthRepository {
   }
 
   private async checkUserActive({ email }) {
-    const user = await this.options.model.findBy('email', email)
-    console.log(user?.status)
-    if (user?.status) {
+    const user = await this.model.findBy('email', email)
+    if (!user?.status) {
       throw new Error('Inative Users cant login')
     }
   }
 
   public async me({ user }) {
-    const fullUser = await this.options.model
-      .query()
-      .preload('profiles')
-      .where('id', user.id)
-      .first()
+    const fullUser = await this.model.query().preload('profiles').where('id', user.id).first()
 
     console.log('fullUser :', fullUser)
     return fullUser

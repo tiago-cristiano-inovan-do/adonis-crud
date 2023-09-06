@@ -7,12 +7,7 @@ interface QueryBuild {
   selectFields: String[]
 }
 
-const keysToIgnorePagination = ['page', 'perPage', 'all']
-
-// const makeQs = ({ qs }) => {
-//   const onlyAllowSelectFields = qs
-//   return onlyAllowSelectFields
-// }
+const keysToIgnorePagination = ['page', 'perPage', 'all', 'include']
 
 export class QueryBuilder {
   public static build({ model, qs }: QueryBuild) {
@@ -22,7 +17,6 @@ export class QueryBuilder {
       if (keysToIgnorePagination.includes(key)) continue
       let value = qs[key]
       let [param, operator = '='] = key.split('.')
-      console.log({ value, operator, param })
       Operators[operator]({ query, param, value })
     }
 
