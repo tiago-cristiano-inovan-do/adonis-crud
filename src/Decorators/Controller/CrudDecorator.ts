@@ -79,7 +79,7 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
       }
 
       const newObject = await options.repository.store(body)
-
+      console.log({new: `${newObject.constructor.table}`)
       options.event.emit(`new:${newObject.constructor.table}`, newObject)
 
       return ctx.response.status(201).json(newObject)

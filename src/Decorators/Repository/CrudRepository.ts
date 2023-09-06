@@ -19,20 +19,11 @@ export interface IndexRequest {
 export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
   return (target) => {
     const functionMap: FunctionMap = {
-      async index({
-        qs: { page = 1, perPage = 10, all = false, ...rest },
-        authUser,
-      }: IndexRequest) {
+      async index({ qs: { page = 1, perPage = 10, all = false, ...rest } }: IndexRequest) {
         const query = QueryBuilder.build({
           model: Model,
           qs: rest,
           selectFields: [],
-        })
-
-        await this.applyScopedQuery({
-          query,
-          model: Model,
-          userAuth: authUser,
         })
 
         if (all) {
@@ -47,7 +38,6 @@ export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
       },
       async store(propsToStore) {
         const model = await Model.create(propsToStore)
-        //options.event.emit(`new:${model}`, model)
         return model
       },
       async update({ id, body }) {
@@ -67,9 +57,6 @@ export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
         } catch (error) {
           return false
         }
-      },
-      async applyScopedQuery() {
-        console.log('not applying scope')
       },
       async getById({ id, status = true }) {
         const query = Model.query()
