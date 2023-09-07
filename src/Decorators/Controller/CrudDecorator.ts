@@ -25,25 +25,27 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
   const functionMap: FunctionMap = {
     async index(ctx) {
       const { transform } = ctx
-
-      let authUser = ctx.auth.user
+      const authUser = ctx.auth.user
+      const { all, page, perPage } = ctx.request.all()
 
       const qs = ctx.request.qs()
 
-      const list = await options.repository.index({ qs, authUser })
+      const query = await options.repository.index({ qs, authUser })
 
+      if (all) {
+        return query.exec()
+      }
+
+      const paginatedItems = await query.paginate(page, perPage)
       const pagination = {
         page: 1,
-
         firstPage: 1,
-
         lastPage: 1,
       }
 
       return {
         pagination,
-
-        data: await transform.withContext(ctx).collection(list, options.transformer),
+        data: await transform.withContext(ctx).collection(paginatedItems, options.transformer),
       }
     },
 
