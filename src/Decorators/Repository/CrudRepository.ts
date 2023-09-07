@@ -1,11 +1,76 @@
 import { LucidModel } from '@ioc:Adonis/Lucid/Orm'
-import { OptionsCrudRepository } from '@ioc:AdonisCrud/Crud/Repository'
-import { CrudRepositoryFactory } from './CrudRepositoryFactory'
-export default function CrudRepository<Model extends LucidModel>(
-  propsDecorator: OptionsCrudRepository<Model>
-) {
-  return <T extends { new (...args: any[]): {} }>(classConstructor: T) => {
-    //@ts-ignore
-    const crudRepository = new CrudRepositoryFactory(classConstructor, propsDecorator)
+import { QueryBuilder } from '../../QueryBuilder/QueryBuilder'
+
+type FunctionMap = {
+  [key: string]: Function
+}
+
+export type QsRequest = {
+  page: number
+  perPage: number
+  all: boolean
+}
+
+export interface IndexRequest {
+  qs: QsRequest
+  authUser?: any
+}
+
+export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
+  return (target) => {
+    const functionMap: FunctionMap = {
+      async index({ qs: { ...rest } }: IndexRequest) {
+        const query = QueryBuilder.build({
+          model: Model,
+          qs: rest,
+          selectFields: [],
+        })
+        console.log('updated to return query')
+        return query
+      },
+      async show({ id, status }) {
+        return this.getById({ id, status })
+      },
+      async store(propsToStore) {
+        const model = await Model.create(propsToStore)
+        return model
+      },
+      async update({ id, body }) {
+        const modelToUpdate = await this.getById({ id })
+        if (!modelToUpdate) {
+          return false
+        }
+        modelToUpdate.merge(body)
+        return await modelToUpdate.save()
+      },
+      async destroy(id) {
+        const modelToDelete = await this.getById({ id })
+        if (!modelToDelete) return false
+        try {
+          await modelToDelete.delete()
+          return true
+        } catch (error) {
+          return false
+        }
+      },
+      async getById({ id, status = true }) {
+        const query = Model.query()
+        const model = await query.where('id', id).where('status', status).first()
+        return model
+      },
+    }
+
+    const targetPrototype = target.prototype
+
+    Object.assign(targetPrototype, {
+      ...functionMap,
+      model: Model,
+    })
+
+    Object.defineProperty(targetPrototype, 'Model', {
+      value: Model,
+      writable: false,
+      configurable: false,
+    })
   }
 }
