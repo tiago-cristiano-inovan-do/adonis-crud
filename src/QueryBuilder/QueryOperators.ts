@@ -4,59 +4,80 @@ interface OperatorQueryParam {
   value: string
 }
 
-const Operators = {
-  '=': ({ query, param, value }: OperatorQueryParam) => {
+export enum Operator {
+  Equals = '=',
+  ILike = '$ilike',
+  GreaterThanOrEqual = '$gte',
+  LessThanOrEqual = '$le',
+  NotEqual = '$not',
+  LessThan = '$lt',
+  GreaterThan = '$gt',
+  LessThanOrEqual2 = '$lte',
+  NotEqual2 = '$ne',
+  Like = '$like',
+  NotLike = '$notLike',
+  ILike2 = '$iLike',
+  NotILike = '$notILike',
+  In = '$in',
+  NotIn = '$notIn',
+  Between = '$between',
+  NotBetween = '$notBetween',
+}
+
+const Operators: Record<Operator, (params: OperatorQueryParam) => void> = {
+  [Operator.Equals]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, value)
   },
-  '$ilike': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.ILike]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, 'ILIKE', `%${value}%`)
   },
-  '$gte': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.GreaterThanOrEqual]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, '>=', value)
   },
-  '$le': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.LessThanOrEqual]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, '<=', value)
   },
-  '$not': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.NotEqual]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, '<>', value)
   },
-  '$lt': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.LessThan]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, '<', value)
   },
-  '$gt': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.GreaterThan]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, '>', value)
   },
-  '$lte': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.LessThanOrEqual2]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, '<=', value)
   },
-  '$ne': ({ query, param, value }: OperatorQueryParam) => {
-    query.whereNot(`${param}`, value)
+  [Operator.NotEqual2]: ({ query, param, value }: OperatorQueryParam) => {
+    query.where(`${param}`, '<>', value)
   },
-  '$like': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.Like]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, 'LIKE', `%${value}%`)
   },
-  '$notLike': ({ query, param, value }: OperatorQueryParam) => {
-    query.whereNot(`${param}`, 'LIKE', `%${value}%`)
+  [Operator.NotLike]: ({ query, param, value }: OperatorQueryParam) => {
+    query.where(`${param}`, 'NOT LIKE', `%${value}%`)
   },
-  '$iLike': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.ILike2]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, 'ILIKE', `%${value}%`)
   },
-  '$notILike': ({ query, param, value }: OperatorQueryParam) => {
-    query.whereNot(`${param}`, 'ILIKE', `%${value}%`)
+  [Operator.NotILike]: ({ query, param, value }: OperatorQueryParam) => {
+    query.where(`${param}`, 'NOT ILIKE', `%${value}%`)
   },
-  '$in': ({ query, param, value }: OperatorQueryParam) => {
-    query.whereIn(`${param}`, value.split(','))
+  [Operator.In]: ({ query, param, value }: OperatorQueryParam) => {
+    query.whereIn(`${param}`, value)
   },
-  '$notIn': ({ query, param, value }: OperatorQueryParam) => {
-    query.whereNotIn(`${param}`, value.split(','))
+  [Operator.NotIn]: ({ query, param, value }: OperatorQueryParam) => {
+    query.whereNotIn(`${param}`, value)
   },
-  '$between': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.Between]: ({ query, param, value }: OperatorQueryParam) => {
     const [start, end] = value.split(',')
     query.whereBetween(`${param}`, [start, end])
   },
-  '$notBetween': ({ query, param, value }: OperatorQueryParam) => {
+  [Operator.NotBetween]: ({ query, param, value }: OperatorQueryParam) => {
     const [start, end] = value.split(',')
     query.whereNotBetween(`${param}`, [start, end])
   },
 }
+
 export { Operators }
