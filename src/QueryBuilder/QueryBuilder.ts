@@ -17,7 +17,6 @@ export class QueryBuilder {
       if (keysToIgnorePagination.includes(key)) continue
       let value = qs[key]
       let parts = key.split('.')
-      console.log({ parts })
       let operator = Operator.Equals
       let param = parts[0]
 
