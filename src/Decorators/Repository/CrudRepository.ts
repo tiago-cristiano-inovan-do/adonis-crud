@@ -1,5 +1,5 @@
 import { LucidModel } from '@ioc:Adonis/Lucid/Orm'
-import { QueryBuilder } from '../../QueryBuilder/QueryBuilder'
+import { QueryBuilder } from '@ioc:AdonisCrud/Crud/QueryBuilder'
 
 type FunctionMap = {
   [key: string]: Function
