@@ -19,13 +19,13 @@ export interface IndexRequest {
 export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
   return (target) => {
     const functionMap: FunctionMap = {
-      async index({ qs: { ...rest } }: IndexRequest) {
+      index({ qs: { ...rest } }: IndexRequest) {
         const query = QueryBuilder.build({
           model: Model,
           qs: rest,
           selectFields: [],
         })
-        console.log('updated to return query')
+        console.log('updated to return query', query)
         return query
       },
       async show({ id, status }) {

@@ -30,7 +30,7 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
 
       const qs = ctx.request.qs()
 
-      const query = await options.repository.index({ qs, authUser })
+      const query = options.repository.index({ qs, authUser })
 
       if (all) {
         return query.exec()
