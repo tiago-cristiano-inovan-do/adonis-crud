@@ -49,6 +49,10 @@ node ace configure adonis-crud
 
 This should update your `.adonisrc.json`, `tsconfig.json` and add a list of other files: [File Genereted](#file-generated-by-adonis-crud)
 
+
+## Usage Example
+Let's create some come.
+
 ## Create the route for the resource
 
 - in **routes.ts** add
@@ -349,3 +353,10 @@ export default class User extends BaseCrudModel {
 ```
 
 ## Query Builder
+
+
+## Contributing
+- Clone this repo
+- Install dependencies: `npm install`
+- Implement your feature
+- build de code: `yarn build`
