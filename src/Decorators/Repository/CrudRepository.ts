@@ -19,19 +19,14 @@ export interface IndexRequest {
 export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
   return (target) => {
     const functionMap: FunctionMap = {
-      async index({ qs: { page = 1, perPage = 10, all = false, ...rest } }: IndexRequest) {
+      index({ qs: { ...rest } }: IndexRequest) {
         const query = QueryBuilder.build({
           model: Model,
           qs: rest,
           selectFields: [],
         })
-
-        if (all) {
-          return query.exec()
-        }
-
-        const paginatedItems = await query.paginate(page, perPage)
-        return paginatedItems
+        console.log('updated to return query', query)
+        return query
       },
       async show({ id, status }) {
         return this.getById({ id, status })
@@ -66,26 +61,6 @@ export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
     }
 
     const targetPrototype = target.prototype
-
-    // Check if the repository has any of the CRUD methods already defined.
-    // If yes, use them instead of the default methods from the decorator.
-    if (targetPrototype.index) {
-      functionMap.index = targetPrototype.index
-    }
-    if (targetPrototype.show) {
-      functionMap.show = targetPrototype.show
-    }
-    if (targetPrototype.store) {
-      functionMap.store = targetPrototype.store
-    }
-    if (targetPrototype.update) {
-      functionMap.update = targetPrototype.update
-    }
-    if (targetPrototype.destroy) {
-      functionMap.destroy = targetPrototype.destroy
-    }
-
-    // Assign the CRUD methods to the target class prototype
 
     Object.assign(targetPrototype, {
       ...functionMap,
