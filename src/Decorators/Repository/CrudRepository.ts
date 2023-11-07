@@ -25,7 +25,6 @@ export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
           qs: rest,
           selectFields: [],
         })
-        console.log('updated to return query', query)
         return query
       },
       async show({ id, status }) {

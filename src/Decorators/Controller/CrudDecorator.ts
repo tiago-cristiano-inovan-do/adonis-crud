@@ -32,15 +32,19 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
 
       const query = options.repository.index({ qs, authUser })
 
+      const total = await query.exec().length
+
       if (all) {
         return query.exec()
       }
 
       const paginatedItems = await query.paginate(page, perPage)
+
       const pagination = {
-        page: 1,
-        firstPage: 1,
-        lastPage: 1,
+        lastPage: perPage !== 'all' ? Math.ceil(total / perPage) : 1,
+        page: parseInt(page),
+        perPage: perPage !== 'all' ? parseInt(perPage) : total,
+        total: total,
       }
 
       return {
@@ -81,7 +85,6 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
       }
 
       const newObject = await options.repository.store(body)
-      console.log({ new: `${newObject.constructor.table}` })
       options.event.emit(`new:${newObject.constructor.table}`, newObject)
 
       return ctx.response.status(201).json(newObject)
