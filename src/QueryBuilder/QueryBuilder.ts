@@ -24,7 +24,6 @@ export class QueryBuilder {
         3: () => {
           const [relation, field, op] = parts
           operator = op.startsWith('$') ? (op as Operator) : Operator.Equals
-          console.log({ operator })
           validateOperator(operator)
           query.whereHas(relation, (subQuery) => {
             debugger

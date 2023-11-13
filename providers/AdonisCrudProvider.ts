@@ -24,10 +24,10 @@ export default class AdonisCrudProvider {
   public async boot() {
     const Route = this.app.container.use('Adonis/Core/Route')
     Route.resource('/codegem', 'CodeGemController').apiOnly()
-    Route.post('/auth/register', 'AuthController.store')
-    Route.post('/auth/login', 'AuthController.login')
-    Route.post('/auth/reset-password', 'AuthController.resetPassword')
-    Route.get('/auth/me', 'AuthController.me').middleware('auth')
+    // Route.post('/auth/register', 'AuthController.store')
+    // Route.post('/auth/login', 'AuthController.login')
+    // Route.post('/auth/reset-password', 'AuthController.resetPassword')
+    // Route.get('/auth/me', 'AuthController.me').middleware('auth')
 
     Route.group(() => {
       Route.resource('profiles', 'ProfileController').apiOnly()

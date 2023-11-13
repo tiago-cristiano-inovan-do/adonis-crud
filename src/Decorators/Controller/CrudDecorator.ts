@@ -32,15 +32,19 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
 
       const query = options.repository.index({ qs, authUser })
 
+      const total = await query.exec().length
+
       if (all) {
         return query.exec()
       }
 
       const paginatedItems = await query.paginate(page, perPage)
+
       const pagination = {
-        page: 1,
-        firstPage: 1,
-        lastPage: 1,
+        lastPage: perPage !== 'all' ? Math.ceil(total / perPage) : 1,
+        page: parseInt(page),
+        perPage: perPage !== 'all' ? parseInt(perPage) : total,
+        total: total,
       }
 
       return {
@@ -81,7 +85,6 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
       }
 
       const newObject = await options.repository.store(body)
-      console.log({ new: `${newObject.constructor.table}` })
       options.event.emit(`new:${newObject.constructor.table}`, newObject)
 
       return ctx.response.status(201).json(newObject)
@@ -103,6 +106,21 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
           return ctx.response.badRequest(this.errorsRequest)
         }
       }
+      const currentObject = await options.repository.getById({ id })
+      if (!currentObject) {
+        return ctx.response.status(404).json({ msg: 'Not Found' })
+      }
+      console.log(`beforeUpdate:${currentObject.constructor.table}`, {
+        id,
+        body,
+        currentObject: currentObject.toJSON(),
+      })
+
+      options.event.emit(`beforeUpdate:${currentObject.constructor.table}`, {
+        body,
+        id,
+        currentObject: currentObject.toJSON(),
+      })
 
       const updatedObject = await options.repository.update({ id, body })
 
@@ -110,8 +128,13 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
         return ctx.response.status(404)
       }
 
-      const updateOutput = await transform.withContext(ctx).item(updatedObject, options.transformer)
+      console.log(`afterUpdate:${currentObject.constructor.table}`, {
+        id,
+        body,
+        updatedObject: updatedObject.toJSON(),
+      })
 
+      const updateOutput = await transform.withContext(ctx).item(updatedObject, options.transformer)
       return ctx.response.status(200).json(updateOutput)
     },
 
