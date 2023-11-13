@@ -46,8 +46,9 @@ export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
         const modelToDelete = await this.getById({ id })
         if (!modelToDelete) return false
         try {
-          await modelToDelete.delete()
-          return true
+          await modelToDelete.merge({ status: false, deleted_at: new Date() })
+          await modelToDelete.save()
+          return modelToDelete
         } catch (error) {
           return false
         }
