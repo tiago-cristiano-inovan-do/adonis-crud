@@ -106,6 +106,21 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
           return ctx.response.badRequest(this.errorsRequest)
         }
       }
+      const currentObject = await options.repository.getById({ id })
+      if (!currentObject) {
+        return ctx.response.status(404).json({ msg: 'Not Found' })
+      }
+      console.log(`beforeUpdate:${currentObject.constructor.table}`, {
+        id,
+        body,
+        currentObject: currentObject.toJSON(),
+      })
+
+      options.event.emit(`beforeUpdate:${currentObject.constructor.table}`, {
+        body,
+        id,
+        currentObject: currentObject.toJSON(),
+      })
 
       const updatedObject = await options.repository.update({ id, body })
 
@@ -113,8 +128,13 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
         return ctx.response.status(404)
       }
 
-      const updateOutput = await transform.withContext(ctx).item(updatedObject, options.transformer)
+      console.log(`afterUpdate:${currentObject.constructor.table}`, {
+        id,
+        body,
+        updatedObject: updatedObject.toJSON(),
+      })
 
+      const updateOutput = await transform.withContext(ctx).item(updatedObject, options.transformer)
       return ctx.response.status(200).json(updateOutput)
     },
 
