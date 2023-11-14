@@ -123,6 +123,7 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
         return ctx.response.status(404)
       }
 
+
       options.event.emit(`afterUpdate:${currentObject.constructor.table}`, {
         body,
         id,
