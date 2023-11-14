@@ -110,11 +110,6 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
       if (!currentObject) {
         return ctx.response.status(404).json({ msg: 'Not Found' })
       }
-      console.log(`beforeUpdate:${currentObject.constructor.table}`, {
-        id,
-        body,
-        currentObject: currentObject.toJSON(),
-      })
 
       options.event.emit(`beforeUpdate:${currentObject.constructor.table}`, {
         body,
@@ -128,9 +123,9 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
         return ctx.response.status(404)
       }
 
-      console.log(`afterUpdate:${currentObject.constructor.table}`, {
-        id,
+      options.event.emit(`afterUpdate:${currentObject.constructor.table}`, {
         body,
+        id,
         updatedObject: updatedObject.toJSON(),
       })
 
@@ -140,10 +135,14 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
 
     async destroy(ctx) {
       const { params } = ctx
-
+      const currentObject = await options.repository.getById({ id: params.id })
       const deleted = await options.repository.destroy(params.id)
 
       if (deleted) {
+        options.event.emit(`afterDelete:${currentObject.constructor.table}`, {
+          id: params.id,
+          deleted: currentObject.toJSON(),
+        })
         return ctx.response.status(204)
       }
 
