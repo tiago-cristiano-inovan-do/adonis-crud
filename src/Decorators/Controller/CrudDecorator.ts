@@ -24,29 +24,32 @@ type FunctionMap = {
 export function Crud(options: CrudOperationsOptions): ClassDecorator {
   const functionMap: FunctionMap = {
     async index(ctx) {
-      const { transform } = ctx
       const authUser = ctx.auth.user
-      const { all, page, perPage } = ctx.request.all()
+
+      const { all, page = 1, perPage = 10, sort = 'created_at', order = 'desc' } = ctx.request.all()
 
       const qs = ctx.request.qs()
 
       const query = options.repository.index({ qs, authUser })
-
+      query.orderBy(sort, order)
       if (all) {
         return query.exec()
       }
 
-      const paginatedItems = await query.paginate(page, perPage)
-      const pagination = {
-        page: 1,
-        firstPage: 1,
-        lastPage: 1,
-      }
+      const { rows, currentPage, total, lastPage } = await query.paginate(page, perPage)
 
-      return {
-        pagination,
-        data: await transform.withContext(ctx).collection(paginatedItems, options.transformer),
-      }
+      return ctx.transform.paginate(
+        {
+          rows,
+          pages: {
+            page: currentPage,
+            perPage: perPage,
+            total: total,
+            lastPage: lastPage,
+          },
+        },
+        options.transformer
+      )
     },
 
     async show(ctx) {
@@ -81,7 +84,6 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
       }
 
       const newObject = await options.repository.store(body)
-      console.log({ new: `${newObject.constructor.table}` })
       options.event.emit(`new:${newObject.constructor.table}`, newObject)
 
       return ctx.response.status(201).json(newObject)
@@ -103,6 +105,16 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
           return ctx.response.badRequest(this.errorsRequest)
         }
       }
+      const currentObject = await options.repository.getById({ id })
+      if (!currentObject) {
+        return ctx.response.status(404).json({ msg: 'Not Found' })
+      }
+
+      options.event.emit(`beforeUpdate:${currentObject.constructor.table}`, {
+        body,
+        id,
+        currentObject: currentObject.toJSON(),
+      })
 
       const updatedObject = await options.repository.update({ id, body })
 
@@ -110,17 +122,26 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
         return ctx.response.status(404)
       }
 
-      const updateOutput = await transform.withContext(ctx).item(updatedObject, options.transformer)
+      options.event.emit(`afterUpdate:${currentObject.constructor.table}`, {
+        body,
+        id,
+        updatedObject: updatedObject.toJSON(),
+      })
 
+      const updateOutput = await transform.withContext(ctx).item(updatedObject, options.transformer)
       return ctx.response.status(200).json(updateOutput)
     },
 
     async destroy(ctx) {
       const { params } = ctx
-
+      const currentObject = await options.repository.getById({ id: params.id })
       const deleted = await options.repository.destroy(params.id)
 
       if (deleted) {
+        options.event.emit(`afterDelete:${currentObject.constructor.table}`, {
+          id: params.id,
+          deleted: currentObject.toJSON(),
+        })
         return ctx.response.status(204)
       }
 
