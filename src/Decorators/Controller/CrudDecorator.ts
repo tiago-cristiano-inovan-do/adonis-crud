@@ -24,33 +24,32 @@ type FunctionMap = {
 export function Crud(options: CrudOperationsOptions): ClassDecorator {
   const functionMap: FunctionMap = {
     async index(ctx) {
-      const { transform } = ctx
       const authUser = ctx.auth.user
-      const { all, page, perPage } = ctx.request.all()
+
+      const { all, page = 1, perPage = 10, sort = 'created_at', order = 'desc' } = ctx.request.all()
 
       const qs = ctx.request.qs()
 
       const query = options.repository.index({ qs, authUser })
-
-      const total = await query.exec().length
-
+      query.orderBy(sort, order)
       if (all) {
         return query.exec()
       }
 
-      const paginatedItems = await query.paginate(page, perPage)
+      const { rows, currentPage, total, lastPage } = await query.paginate(page, perPage)
 
-      const pagination = {
-        lastPage: perPage !== 'all' ? Math.ceil(total / perPage) : 1,
-        page: parseInt(page),
-        perPage: perPage !== 'all' ? parseInt(perPage) : total,
-        total: total,
-      }
-
-      return {
-        pagination,
-        data: await transform.withContext(ctx).collection(paginatedItems, options.transformer),
-      }
+      return ctx.transform.paginate(
+        {
+          rows,
+          pages: {
+            page: currentPage,
+            perPage: perPage,
+            total: total,
+            lastPage: lastPage,
+          },
+        },
+        options.transformer
+      )
     },
 
     async show(ctx) {
@@ -122,7 +121,6 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
       if (!updatedObject) {
         return ctx.response.status(404)
       }
-
 
       options.event.emit(`afterUpdate:${currentObject.constructor.table}`, {
         body,
