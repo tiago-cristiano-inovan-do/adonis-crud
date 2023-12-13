@@ -28,7 +28,7 @@ export class QueryBuilder {
           operator = op.startsWith('$') ? (op as Operator) : Operator.Equals
           validateOperator(operator)
           query.whereHas(relation, (subQuery) => {
-            Operators[operator]({ query: subQuery, param: field, value })
+            Operators[operator]({ query: subQuery, param: field, value, relation })
           })
         },
         2: () => {
