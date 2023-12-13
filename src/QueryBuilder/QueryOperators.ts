@@ -2,6 +2,7 @@ interface OperatorQueryParam {
   query: any
   param: string
   value: string
+  relation?: string
 }
 
 export enum Operator {
@@ -64,11 +65,12 @@ const Operators: Record<Operator, (params: OperatorQueryParam) => void> = {
   [Operator.NotILike]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, 'NOT ILIKE', `%${value}%`)
   },
-  [Operator.In]: ({ query, param, value }: OperatorQueryParam) => {
-    query.whereIn(`${param}`, value)
+  [Operator.In]: ({ query, param, value, relation }: OperatorQueryParam) => {
+    debugger
+    query.whereIn(`${relation}.${param}`, value.split(','))
   },
   [Operator.NotIn]: ({ query, param, value }: OperatorQueryParam) => {
-    query.whereNotIn(`${param}`, value)
+    query.whereNotIn(`${param}`, value.split(','))
   },
   [Operator.Between]: ({ query, param, value }: OperatorQueryParam) => {
     const [start, end] = value.split(',')

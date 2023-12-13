@@ -38,7 +38,7 @@ export default async function instructions(projectRoot: string) {
   const controllerPath = `${projectRoot}/app/Controllers/Http`
   copyFolderToProjetct({ pathDestiny: controllerPath, folder: 'Controllers' })
 
-  console.log('Coping Prividers')
+  console.log('Coping Providers')
   const providersPath = `${projectRoot}/providers`
   copyFolderToProjetct({ pathDestiny: providersPath, folder: 'providers', noCaptlize: true })
 
@@ -66,48 +66,11 @@ export default async function instructions(projectRoot: string) {
     noCaptlize: true,
   })
 
-  // Coby Controllers
-  // console.log('Coping Controllers')
-  // const controllersPath = `${projectRoot}/app/Controllers/Http`
-  // console.log({ controllersPath, projectRoot })
-  // if (!fs.existsSync(controllersPath)) {
-  //   fs.mkdirSync(modelPath, { recursive: true })
-  // }
-
-  // // 3. Copy models
-  // const modelPath = `${projectRoot}/app/Models`
-  // if (!fs.existsSync(modelPath)) {
-  //   fs.mkdirSync(modelPath, { recursive: true })
-  // }
-  // fs.copyFileSync(`${packageBasePath}/models/Permission.txt`, `${modelPath}/Permission.ts`)
-  // fs.copyFileSync(`${packageBasePath}/models/Role.txt`, `${modelPath}/Role.ts`)
-  // fs.copyFileSync(`${packageBasePath}/models/RolePermission.txt`, `${modelPath}/RolePermission.ts`)
-  // fs.copyFileSync(`${packageBasePath}/models/UserPermission.txt`, `${modelPath}/UserPermission.ts`)
-  // fs.copyFileSync(`${packageBasePath}/models/UserRole.txt`, `${modelPath}/UserRole.ts`)
-
-  // // 4. Copy migrations
-  // const migrationPath = `${projectRoot}/database/migrations`
-  // if (!fs.existsSync(migrationPath)) {
-  //   fs.mkdirSync(migrationPath, { recursive: true })
-  // }
-  // fs.copyFileSync(
-  //   `${packageBasePath}/migrations/acl_1_roles.txt`,
-  //   `${migrationPath}/acl_1_roles.ts`
-  // )
-  // fs.copyFileSync(
-  //   `${packageBasePath}/migrations/acl_2_permissions.txt`,
-  //   `${migrationPath}/acl_2_permissions.ts`
-  // )
-  // fs.copyFileSync(
-  //   `${packageBasePath}/migrations/acl_3_role_permissions.txt`,
-  //   `${migrationPath}/acl_3_role_permissions.ts`
-  // )
-  // fs.copyFileSync(
-  //   `${packageBasePath}/migrations/acl_4_user_permissions.txt`,
-  //   `${migrationPath}/acl_4_user_permissions.ts`
-  // )
-  // fs.copyFileSync(
-  //   `${packageBasePath}/migrations/acl_5_user_roles.txt`,
-  //   `${migrationPath}/acl_5_user_roles.ts`
-  // )
+  console.log('Coping code-templates')
+  const codeTemplatesPath = `${projectRoot}/code-templates`
+  copyFolderToProjetct({
+    pathDestiny: codeTemplatesPath,
+    folder: 'code-templates',
+    noCaptlize: true,
+  })
 }

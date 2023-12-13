@@ -1,5 +1,0 @@
-public async include{{pascalCase modelB}}(model) {
-    const [includedModel] = await model.related('{{pascalCase modelB}}').query().select(['id'])
-    return this.item(includedModel, {{pascalCase modelBTransformer}})
-}
-

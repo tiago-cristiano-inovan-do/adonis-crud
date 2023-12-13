@@ -8,13 +8,15 @@ interface QueryBuild {
 }
 
 const keysToIgnorePagination = ['page', 'perPage', 'all', 'include']
+const orderAndSortToIgnore = ['order', 'sort']
+const keysToIgnore = keysToIgnorePagination.concat(orderAndSortToIgnore)
 
 export class QueryBuilder {
   public static build({ model, qs }: QueryBuild) {
     const query = model.query<any>()
 
     for (const key in qs) {
-      if (keysToIgnorePagination.includes(key)) continue
+      if (keysToIgnore.includes(key)) continue
       let value = qs[key]
       let parts = key.split('.')
       let operator = Operator.Equals
@@ -24,11 +26,9 @@ export class QueryBuilder {
         3: () => {
           const [relation, field, op] = parts
           operator = op.startsWith('$') ? (op as Operator) : Operator.Equals
-          console.log({ operator })
           validateOperator(operator)
           query.whereHas(relation, (subQuery) => {
-            debugger
-            Operators[operator]({ query: subQuery, param: field, value })
+            Operators[operator]({ query: subQuery, param: field, value, relation })
           })
         },
         2: () => {
