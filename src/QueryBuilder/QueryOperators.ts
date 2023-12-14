@@ -66,7 +66,6 @@ const Operators: Record<Operator, (params: OperatorQueryParam) => void> = {
     query.where(`${param}`, 'NOT ILIKE', `%${value}%`)
   },
   [Operator.In]: ({ query, param, value, relation }: OperatorQueryParam) => {
-    debugger
     query.whereIn(`${relation}.${param}`, value.split(','))
   },
   [Operator.NotIn]: ({ query, param, value }: OperatorQueryParam) => {
