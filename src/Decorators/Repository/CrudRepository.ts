@@ -49,6 +49,7 @@ export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
         try {
           await modelToDelete.merge({ status: false, deleted_at: DateTime.now() })
           await modelToDelete.save()
+
           return true
         } catch (error) {
           throw error

@@ -1,12 +1,16 @@
+const WHERE_OPERATOR_END = 'AND'
+const WHERE_OPERATOR_OR = 'OR'
+
 interface OperatorQueryParam {
   query: any
   param: string
   value: string
   relation?: string
+  whereOperator: string
 }
 
 export enum Operator {
-  Equals = '=',
+  Equals = '$equals',
   ILike = '$ilike',
   GreaterThanOrEqual = '$gte',
   LessThanOrEqual = '$le',
@@ -26,11 +30,20 @@ export enum Operator {
 }
 
 const Operators: Record<Operator, (params: OperatorQueryParam) => void> = {
-  [Operator.Equals]: ({ query, param, value }: OperatorQueryParam) => {
-    query.where(`${param}`, value)
+  [Operator.Equals]: ({ query, param, value, relation }: OperatorQueryParam) => {
+    if (relation && relation !== '') {
+      query.where(`${relation}.${param}`, value)
+    }
+
+    if (relation === '') {
+      query.where(`${param}`, value)
+    }
   },
-  [Operator.ILike]: ({ query, param, value }: OperatorQueryParam) => {
-    query.where(`${param}`, 'ILIKE', `%${value}%`)
+  [Operator.ILike]: ({ query, param, value, whereOperator }: OperatorQueryParam) => {
+    if (whereOperator.toUpperCase() === WHERE_OPERATOR_END)
+      query.where(`${param}`, 'ILIKE', `%${value}%`)
+    if (whereOperator.toUpperCase() === WHERE_OPERATOR_OR)
+      query.orWhere(`${param}`, 'ILIKE', `%${value}%`)
   },
   [Operator.GreaterThanOrEqual]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, '>=', value)
