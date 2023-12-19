@@ -1,14 +1,20 @@
 {
-  "exclude": ["./templates"],
+  "exclude": [
+    "./templates"
+  ],
   "extends": "./node_modules/@adonisjs/mrm-preset/_tsconfig",
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2015",
     "declaration": true,
     "sourceMap": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "types": ["@adonisjs/core", "@adonisjs/lucid", "adonis-bumblebee-ts"],
+    "types": [
+      "@adonisjs/core",
+      "@adonisjs/lucid",
+      "adonis-bumblebee-ts"
+    ],
     "outDir": "build"
   }
 }
