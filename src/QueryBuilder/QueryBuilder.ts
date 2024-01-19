@@ -1,7 +1,5 @@
 import { Operator, Operators } from './QueryOperators'
 
-import Logger from '@ioc:Adonis/Core/Logger'
-
 const keysToIgnorePagination = ['page', 'perPage', 'all', 'include']
 const orderAndSortToIgnore = ['order', 'sort']
 const queryOpertosToIgnore = [
@@ -74,7 +72,6 @@ export class QueryBuilder {
 
   private static applyOrder(query, qs) {
     query.orderBy(qs.sort, qs.order)
-    Logger.info(typeof this.handleOrderAndSort)
   }
 
   public static build({ model, qs, selectFields }): any {
