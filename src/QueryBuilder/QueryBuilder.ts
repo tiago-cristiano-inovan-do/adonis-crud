@@ -151,6 +151,11 @@ export class QueryBuilder {
       }
     }
   }
+  private static parseBooleanParams(value) {
+    const booleans = { ['true']: true, ['false']: false }
+    return value.split(',').map((e) => booleans[e])
+  }
+
   private static handleQueryStringParameters(query: any, qs: any, whereOperator: string) {
     for (const key in qs) {
       if (keysToIgnore.includes(key)) continue
@@ -159,6 +164,9 @@ export class QueryBuilder {
 
       let param = parts[0]
 
+      if (param === 'status') {
+        value = this.parseBooleanParams(value)
+      }
       const scenarios = {
         3: () => this.handleThreePartKey(query, parts, value, whereOperator),
         2: () => this.handleTwoPartKey(query, parts, value, whereOperator),
