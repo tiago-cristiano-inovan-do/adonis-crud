@@ -70,8 +70,8 @@ export class QueryBuilder {
   //   query.orderBy(sort, order)
   // }
 
-  private static applyOrder(query, qs) {
-    query.orderBy(qs.sort, qs.order)
+  private static applyOrder(query, { sort = 'created_at', order = 'asc' }) {
+    query.orderBy(sort, order)
   }
 
   public static build({ model, qs, selectFields }): any {
