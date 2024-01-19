@@ -32,43 +32,43 @@ export class QueryBuilder {
       throw new Error(`invalid relations includes ${includesNotAvailables.map((e) => e)}`)
     }
   }
-  private static handleOrderAndSort({
-    query,
-    order_fields_relationships,
-    relational_pivot_table,
-    relational_join_key,
-    model,
-    relational_local_key,
-  }) {
-    const [key] = Object.keys(order_fields_relationships)
+  // private static handleOrderAndSort({
+  //   query,
+  //   order_fields_relationships,
+  //   relational_pivot_table,
+  //   relational_join_key,
+  //   model,
+  //   relational_local_key,
+  // }) {
+  //   const [key] = Object.keys(order_fields_relationships)
 
-    let joinParams = [key]
+  //   let joinParams = [key]
 
-    if (relational_pivot_table[key]) {
-      joinParams = relational_pivot_table[key].split(',')
+  //   if (relational_pivot_table[key]) {
+  //     joinParams = relational_pivot_table[key].split(',')
 
-      if (joinParams.length > 3) return
+  //     if (joinParams.length > 3) return
 
-      const [table, localKey, fk] = joinParams
+  //     const [table, localKey, fk] = joinParams
 
-      query.join(table, localKey, fk)
+  //     query.join(table, localKey, fk)
 
-      query.join(
-        key,
-        `${joinParams[0]}.${relational_join_key[key]}`,
-        `${model.table}.${relational_local_key[key]}`
-      )
-    }
+  //     query.join(
+  //       key,
+  //       `${joinParams[0]}.${relational_join_key[key]}`,
+  //       `${model.table}.${relational_local_key[key]}`
+  //     )
+  //   }
 
-    const [sort, order] = order_fields_relationships[key].split(',')
+  //   const [sort, order] = order_fields_relationships[key].split(',')
 
-    query.join(
-      key,
-      `${key}.${relational_join_key[key]}`,
-      `${model.table}.${relational_local_key[key]}`
-    )
-    query.orderBy(sort, order)
-  }
+  //   query.join(
+  //     key,
+  //     `${key}.${relational_join_key[key]}`,
+  //     `${model.table}.${relational_local_key[key]}`
+  //   )
+  //   query.orderBy(sort, order)
+  // }
 
   private static applyOrder(query, qs) {
     query.orderBy(qs.sort, qs.order)
