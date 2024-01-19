@@ -1,5 +1,6 @@
 import { LucidModel } from '@ioc:Adonis/Lucid/Orm'
 import { QueryBuilder } from '../../QueryBuilder/QueryBuilder'
+import { DateTime } from 'luxon'
 
 type FunctionMap = {
   [key: string]: Function
@@ -25,7 +26,6 @@ export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
           qs: rest,
           selectFields: [],
         })
-        console.log('updated to return query', query)
         return query
       },
       async show({ id, status }) {
@@ -47,10 +47,12 @@ export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
         const modelToDelete = await this.getById({ id })
         if (!modelToDelete) return false
         try {
-          await modelToDelete.delete()
+          await modelToDelete.merge({ status: false, deleted_at: DateTime.now() })
+          await modelToDelete.save()
+
           return true
         } catch (error) {
-          return false
+          throw error
         }
       },
       async getById({ id, status = true }) {
