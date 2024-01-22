@@ -55,9 +55,14 @@ export function CrudRepository<T extends LucidModel>(Model: T): ClassDecorator {
           throw error
         }
       },
-      async getById({ id, status = true }) {
+      async getById({ id, status }) {
         const query = Model.query()
-        const model = await query.where('id', id).where('status', status).first()
+
+        if (status) {
+          query.where('status', status)
+        }
+
+        const model = await query.where('id', id).first()
         return model
       },
     }
