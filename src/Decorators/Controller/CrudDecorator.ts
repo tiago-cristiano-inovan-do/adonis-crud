@@ -64,7 +64,7 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
 
         authUser,
 
-        status: queryString.status || true,
+        status: queryString.status,
       })
 
       return await transform.withContext(ctx).item(data, options.transformer)
