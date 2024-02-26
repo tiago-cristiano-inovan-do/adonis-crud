@@ -1,4 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import PaginationResponse from './PaginationHelper'
 export interface CrudOperationsOptions {
   repository: any
 
@@ -26,30 +27,24 @@ export function Crud(options: CrudOperationsOptions): ClassDecorator {
     async index(ctx) {
       const authUser = ctx.auth.user
 
-      const { all, page = 1, perPage = 10, sort = 'created_at', order = 'desc' } = ctx.request.all()
+      const { all, sort = 'created_at', order = 'desc' } = ctx.request.all()
 
       const qs = ctx.request.qs()
 
       const query = options.repository.index({ qs, authUser })
+
       query.orderBy(sort, order)
+
       if (all) {
         return query.exec()
       }
 
-      const { rows, currentPage, total, lastPage } = await query.paginate(page, perPage)
-
-      return ctx.transform.paginate(
-        {
-          rows,
-          pages: {
-            page: currentPage,
-            perPage: perPage,
-            total: total,
-            lastPage: lastPage,
-          },
-        },
-        options.transformer
-      )
+      return PaginationResponse({
+        qs,
+        query,
+        transformerClass: options.transformer,
+        ctx,
+      })
     },
 
     async show(ctx) {

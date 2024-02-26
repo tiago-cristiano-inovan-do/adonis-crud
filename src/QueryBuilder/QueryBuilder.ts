@@ -1,6 +1,6 @@
-import { Operator, Operators } from './QueryOperators'
+import { Operator, Operators, WHERE_OPERATOR_OR } from './QueryOperators'
 
-const keysToIgnorePagination = ['page', 'perPage', 'all', 'include']
+const keysToIgnorePagination = ['page', 'perPage', 'all', 'include', 'header']
 const orderAndSortToIgnore = ['order', 'sort']
 const queryOpertosToIgnore = [
   'select_fields',
@@ -32,46 +32,40 @@ export class QueryBuilder {
       throw new Error(`invalid relations includes ${includesNotAvailables.map((e) => e)}`)
     }
   }
-  // private static handleOrderAndSort({
-  //   query,
-  //   order_fields_relationships,
-  //   relational_pivot_table,
-  //   relational_join_key,
-  //   model,
-  //   relational_local_key,
-  // }) {
-  //   const [key] = Object.keys(order_fields_relationships)
 
-  //   let joinParams = [key]
+  private static applyOrder({ query, qs, model }) {
+    const { sort = 'created_at', order = 'asc', select_fields_relationships } = qs
+    const [relation, field] = sort.split('.')
+    const tableName = model.table
+    let select = [`*`]
 
-  //   if (relational_pivot_table[key]) {
-  //     joinParams = relational_pivot_table[key].split(',')
+    if (select_fields_relationships) {
+      select = select_fields_relationships[relation]?.split(',')
+    }
 
-  //     if (joinParams.length > 3) return
+    if (relation && field) {
+      const relationModel = model.$getRelation(`${relation}`).relatedModel()
+      const { table: relationTable } = relationModel
+      const relationShiopDefinitions = model.$relationsDefinitions.get(relation)
+      const { options, type } = relationShiopDefinitions
+      const { foreignKey, localKey } = options
+      const s = select.map((field) => `${relationTable}.${field}`)
+      const selectQueryFields = [...s, `${tableName}.*`, `${relationTable}.id as ${relation}_id`]
 
-  //     const [table, localKey, fk] = joinParams
+      if (type === 'belongsTo') {
+        query.join(`${relationTable}`, `${tableName}.${foreignKey}`, `${relationTable}.id`)
+      }
 
-  //     query.join(table, localKey, fk)
+      if (type === 'hasOne') {
+        query.join(`${relationTable}`, `${tableName}.${localKey}`, `${relationTable}.${foreignKey}`)
+      }
 
-  //     query.join(
-  //       key,
-  //       `${joinParams[0]}.${relational_join_key[key]}`,
-  //       `${model.table}.${relational_local_key[key]}`
-  //     )
-  //   }
+      query.select(selectQueryFields).orderBy(`${relationTable}.${field}`, order)
+    }
 
-  //   const [sort, order] = order_fields_relationships[key].split(',')
-
-  //   query.join(
-  //     key,
-  //     `${key}.${relational_join_key[key]}`,
-  //     `${model.table}.${relational_local_key[key]}`
-  //   )
-  //   query.orderBy(sort, order)
-  // }
-
-  private static applyOrder(query, { sort = 'created_at', order = 'asc' }) {
-    query.orderBy(sort, order)
+    if (!field) {
+      query.orderBy(sort, order)
+    }
   }
 
   public static build({ model, qs, selectFields }): any {
@@ -79,30 +73,14 @@ export class QueryBuilder {
     const mergedSelectFields = new Set(selectFields.concat(selectFieldsQs))
 
     const query = model.query().select([...mergedSelectFields] as unknown as Array<string>)
+
     const whereOperator = qs?.where_operator || 'and'
     const includes = this.splitAndTrim(qs.include)
 
-    this.handleIncludes(query, includes, qs.select_fields_relationships, model)
+    this.handleIncludes(query, includes, model, qs)
     this.handleQueryStringParameters(query, qs, whereOperator)
-    this.applyOrder(query, qs)
+    this.applyOrder({ query, qs, model })
     return query
-  }
-
-  private static handleSecondRelation(
-    query: any,
-    firstRelation: string,
-    secondRelation: string,
-    selectFieldsRelation: string[],
-    fieldsRelationsShips: any
-  ) {
-    query.preload(`${firstRelation}`, (q) => {
-      q.select(selectFieldsRelation)
-      q.preload(`${secondRelation}`, (queryB) => {
-        const selectFieldsSecondRelation = this.splitAndTrim(fieldsRelationsShips[secondRelation])
-        if (selectFieldsSecondRelation)
-          queryB.select(`${secondRelation}.${selectFieldsSecondRelation}`)
-      })
-    })
   }
 
   private static splitAndTrim(str: string): string[] {
@@ -114,46 +92,56 @@ export class QueryBuilder {
     )
   }
 
-  private static handleIncludes(query: any, includes: string[], fieldsRelationsShips: any, model) {
+  private static async handleIncludes(query: any, includes: string[], model, qs) {
+    const arrayOptions = []
+    const { select_fields_relationships } = qs
+
     for (const include of includes) {
       const [firstRelation, secondRelation] = include.split('.')
+      const selectFields = select_fields_relationships?.[firstRelation] || '*'
+      const selectFieldsSecond = select_fields_relationships?.[secondRelation] || '*'
+
+      if (!arrayOptions[firstRelation]) {
+        arrayOptions[firstRelation] = { firstRelation, subs: [], selectFields }
+      }
+
+      if (secondRelation) {
+        arrayOptions[firstRelation].subs.push({ secondRelation, selectFieldsSecond })
+      }
 
       if (firstRelation && !secondRelation) {
         this.hasInclude(model, includes)
       }
+    }
 
-      const selectFieldsRelation = this.splitAndTrim(fieldsRelationsShips[firstRelation])
-      const formatSelectFields = selectFieldsRelation.map((e) => `${firstRelation}.${e}`)
-      if (secondRelation) {
-        const secondRelationSelectFieldsRelation = this.splitAndTrim(
-          fieldsRelationsShips[secondRelation]
-        )
-        const secondfRelationFormatSelectFields = secondRelationSelectFieldsRelation.map(
-          (e) => `${secondRelation}.${e}`
-        )
+    if (arrayOptions) {
+      for (const relationOption of Object.keys(arrayOptions)) {
+        query.preload(`${arrayOptions[relationOption].firstRelation}`, (q) => {
+          const selectFirst = `${arrayOptions[relationOption].selectFields}` || '*'
+          let valuesArray = selectFirst.split(',')
+          q.select(valuesArray)
 
-        this.handleSecondRelation(
-          query,
-          firstRelation,
-          secondRelation,
-          secondfRelationFormatSelectFields,
-          fieldsRelationsShips
-        )
-      }
-
-      if (!secondRelation) {
-        query.preload(include, (q) => {
-          if (formatSelectFields.length) q.select(formatSelectFields)
+          arrayOptions[relationOption].subs.forEach((sub) => {
+            q.preload(`${sub.secondRelation}`, (secondQuery) => {
+              const select = sub?.selectFieldsSecond?.split(',') || '*'
+              secondQuery.select(select)
+            })
+          })
         })
       }
     }
   }
-  private static parseBooleanParams(value) {
+
+  private static parseBooleanParams(value, operator) {
     const booleans = { ['true']: true, ['false']: false }
-    return value.split(',').map((e) => booleans[e])
+    if (operator === '$in' || operator === '$notIn') {
+      const arr = value.split(',').map((e) => booleans[e])
+      return arr
+    }
+    return booleans[value]
   }
 
-  private static handleQueryStringParameters(query: any, qs: any, whereOperator: string) {
+  private static async handleQueryStringParameters(query: any, qs: any, whereOperator: string) {
     for (const key in qs) {
       if (keysToIgnore.includes(key)) continue
       let value = qs[key]
@@ -161,9 +149,6 @@ export class QueryBuilder {
 
       let param = parts[0]
 
-      if (param === 'status') {
-        value = this.parseBooleanParams(value)
-      }
       const scenarios = {
         3: () => this.handleThreePartKey(query, parts, value, whereOperator),
         2: () => this.handleTwoPartKey(query, parts, value, whereOperator),
@@ -177,6 +162,18 @@ export class QueryBuilder {
     }
   }
 
+  private static getTableNameRelation(query, relation) {
+    const model = query.model.$relationsDefinitions
+    let table
+    model.forEach((e) => {
+      if (e.relationName === relation) {
+        table = e.relatedModel().table
+      }
+    })
+
+    return table ? table : 'relation not found!'
+  }
+
   private static handleThreePartKey(
     query: any,
     parts: string[],
@@ -184,15 +181,52 @@ export class QueryBuilder {
     whereOperator: string
   ) {
     const [relation, field, op] = parts
+
+    let table = this.getTableNameRelation(query, relation)
+
     let operator = op.startsWith('$') ? (op as Operator) : Operator.Equals
-    query.whereHas(relation, (subQuery) => {
-      Operators[operator]({ query: subQuery, param: field, value, relation, whereOperator })
-    })
+    let bolean_params = value
+    if (
+      (operator === '$in' || operator === '$notIn') &&
+      (value === 'true,false' || value === 'false,true')
+    ) {
+      bolean_params = this.parseBooleanParams(value, operator)
+    }
+
+    if (whereOperator.toUpperCase() === WHERE_OPERATOR_OR) {
+      query.orWhereHas(relation, (subQuery) => {
+        Operators[operator]({
+          query: subQuery,
+          param: field,
+          value: bolean_params,
+          relation: table,
+          whereOperator,
+        })
+      })
+    }
+
+    if (whereOperator.toUpperCase() !== WHERE_OPERATOR_OR) {
+      query.whereHas(relation, (subQuery) => {
+        Operators[operator]({
+          query: subQuery,
+          param: field,
+          value: bolean_params,
+          relation: table,
+          whereOperator,
+        })
+      })
+    }
+
+    // query.whereHas(relation, (subQuery) => {
+    //   Operators[operator]({ query: subQuery, param: field, value, relation, whereOperator })
+    // })
   }
 
   private static handleTwoPartKey(query: any, parts: string[], value: any, whereOperator: string) {
     const [first, second] = parts
+
     let operator: any = second as Operator
+
     if (second.startsWith('$')) {
       Operators[operator]({ query, param: first, value, whereOperator })
     } else {
@@ -203,7 +237,12 @@ export class QueryBuilder {
   }
 
   private static handleOnePartKey(query: any, param: string, value: any, whereOperator: string) {
+    const tableName = query.model.table
+    let paramWithTableName = `${tableName}.${param}`
     let operator: any = Operator.Equals
-    Operators[operator]({ query, param, value, whereOperator })
+    if (value === 'true' || value === 'false') {
+      value = this.parseBooleanParams(value, operator)
+    }
+    Operators[operator]({ query, param: paramWithTableName, value, whereOperator })
   }
 }
