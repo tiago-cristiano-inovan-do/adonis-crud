@@ -1,5 +1,5 @@
-const WHERE_OPERATOR_END = 'AND'
-const WHERE_OPERATOR_OR = 'OR'
+export const WHERE_OPERATOR_END = 'AND'
+export const WHERE_OPERATOR_OR = 'OR'
 
 interface OperatorQueryParam {
   query: any
@@ -15,6 +15,8 @@ export enum Operator {
   GreaterThanOrEqual = '$gte',
   LessThanOrEqual = '$le',
   NotEqual = '$not',
+  Null = '$null',
+  NotNull = '$notNull',
   LessThan = '$lt',
   GreaterThan = '$gt',
   LessThanOrEqual2 = '$lte',
@@ -35,15 +37,27 @@ const Operators: Record<Operator, (params: OperatorQueryParam) => void> = {
       query.where(`${relation}.${param}`, value)
     }
 
-    if (relation === '') {
+    if (!relation) {
       query.where(`${param}`, value)
     }
   },
-  [Operator.ILike]: ({ query, param, value, whereOperator }: OperatorQueryParam) => {
+  [Operator.ILike]: ({ query, param, value, whereOperator, relation }: OperatorQueryParam) => {
+    if (relation) {
+      if (whereOperator.toUpperCase() === WHERE_OPERATOR_END)
+        query.where(`${relation}.${param}`, 'ILIKE', `%${value}%`)
+
+      if (whereOperator.toUpperCase() === WHERE_OPERATOR_OR)
+        query.orWhere(`${relation}.${param}`, 'ILIKE', `%${value}%`)
+    }
+
     if (whereOperator.toUpperCase() === WHERE_OPERATOR_END)
       query.where(`${param}`, 'ILIKE', `%${value}%`)
-    if (whereOperator.toUpperCase() === WHERE_OPERATOR_OR)
-      query.orWhere(`${param}`, 'ILIKE', `%${value}%`)
+
+    if (whereOperator.toUpperCase() === WHERE_OPERATOR_OR) {
+      query.orWhere((q) => {
+        q.where(`${param}`, 'ILIKE', `%${value}%`)
+      })
+    }
   },
   [Operator.GreaterThanOrEqual]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, '>=', value)
@@ -53,6 +67,12 @@ const Operators: Record<Operator, (params: OperatorQueryParam) => void> = {
   },
   [Operator.NotEqual]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, '<>', value)
+  },
+  [Operator.NotNull]: ({ query, param }: OperatorQueryParam) => {
+    query.whereNotNull(`${param}`)
+  },
+  [Operator.Null]: ({ query, param }: OperatorQueryParam) => {
+    query.where(`${param}`, null)
   },
   [Operator.LessThan]: ({ query, param, value }: OperatorQueryParam) => {
     query.where(`${param}`, '<', value)
@@ -79,19 +99,22 @@ const Operators: Record<Operator, (params: OperatorQueryParam) => void> = {
     query.where(`${param}`, 'NOT ILIKE', `%${value}%`)
   },
   [Operator.In]: ({ query, param, value, relation }: OperatorQueryParam) => {
-    const isBoolean = param === 'status'
+    const isString = typeof value === 'string'
 
     if (relation && relation !== '') {
-      query.whereIn(`${relation}.${param}`, isBoolean ? value : value.split(','))
+      query.whereIn(`${relation}.${param}`, !isString ? value : value.split(','))
     }
 
     if (!relation) {
-      query.whereIn(`${param}`, isBoolean ? value : value.split(','))
+      query.whereIn(`${param}`, !isString ? value : value.split(','))
     }
   },
   [Operator.NotIn]: ({ query, param, value }: OperatorQueryParam) => {
-    query.whereNotIn(`${param}`, value.split(','))
+    const isString = typeof value === 'string'
+
+    query.whereNotIn(`${param}`, !isString ? value : value.split(','))
   },
+
   [Operator.Between]: ({ query, param, value }: OperatorQueryParam) => {
     const [start, end] = value.split(',')
     query.whereBetween(`${param}`, [start, end])
