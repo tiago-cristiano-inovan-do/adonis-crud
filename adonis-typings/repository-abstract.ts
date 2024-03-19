@@ -27,7 +27,7 @@ declare module '@ioc:AdonisCrud/Crud/AbstractCrudRepository' {
   export interface AbstractCrudRepositoryInterface<T> {
     index(request: IndexRequest): Promise<any>
     show(id: string): Promise<T>
-    update({ id, body }: RequestUpdatePayload<T>): Promise<T>
+    update({ id, body }: AbstractCrudRepositoryRequestUpdatePayload<T>): Promise<T>
     destroy(id: string)
     getById(id: string)
     bulkInsert(items: Partial<T>[])
