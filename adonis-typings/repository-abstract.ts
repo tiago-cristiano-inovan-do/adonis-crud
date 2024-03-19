@@ -1,9 +1,7 @@
 declare module '@ioc:AdonisCrud/Crud/AbstractCrudRepository' {
   import { LucidModel } from '@ioc:Adonis/Lucid/Orm'
-  import { QueryBuilder } from '@ioc:AdonisCrud/Crud/QueryBuilder'
-  import { DateTime } from 'luxon'
 
-  export type QsRequest = {
+  export type AbstractCrudRepositoryQsRequest = {
     page?: number
     perPage?: number
     all?: boolean
@@ -12,16 +10,16 @@ declare module '@ioc:AdonisCrud/Crud/AbstractCrudRepository' {
   }
 
   export interface IndexRequest {
-    qs: QsRequest
+    qs: AbstractCrudRepositoryQsRequest
     authUser?: any
   }
 
-  export type RequestUpdatePayload<T> = {
+  export type AbstractCrudRepositoryRequestUpdatePayload<T> = {
     id: string
     body: Partial<T>
   }
 
-  export type GetByIdRequest = {
+  export type AbstractCrudRepositoryGetByIdRequest = {
     id: string
     status: boolean
   }
@@ -37,9 +35,9 @@ declare module '@ioc:AdonisCrud/Crud/AbstractCrudRepository' {
     store(propsToStore: Partial<T>): Promise<T>
   }
 
-  const AbstractCrudRepository: {
+  const AbstractCrudRepositoryService: {
     new <T>(model: LucidModel): AbstractCrudRepositoryInterface<T>
   }
 
-  export { AbstractCrudRepository }
+  export { AbstractCrudRepositoryService }
 }
