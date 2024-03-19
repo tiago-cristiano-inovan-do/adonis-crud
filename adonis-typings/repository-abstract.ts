@@ -1,7 +1,9 @@
 declare module '@ioc:AdonisCrud/Crud/AbstractCrudRepository' {
   import { LucidModel } from '@ioc:Adonis/Lucid/Orm'
+  import { QueryBuilder } from '@ioc:AdonisCrud/Crud/QueryBuilder'
+  import { DateTime } from 'luxon'
 
-  export type AbstractCrudRepositoryQsRequest = {
+  export type QsRequest = {
     page?: number
     perPage?: number
     all?: boolean
@@ -10,16 +12,16 @@ declare module '@ioc:AdonisCrud/Crud/AbstractCrudRepository' {
   }
 
   export interface IndexRequest {
-    qs: AbstractCrudRepositoryQsRequest
+    qs: QsRequest
     authUser?: any
   }
 
-  export type AbstractCrudRepositoryRequestUpdatePayload<T> = {
+  export type RequestUpdatePayload<T> = {
     id: string
     body: Partial<T>
   }
 
-  export type AbstractCrudRepositoryGetByIdRequest = {
+  export type GetByIdRequest = {
     id: string
     status: boolean
   }
@@ -27,7 +29,7 @@ declare module '@ioc:AdonisCrud/Crud/AbstractCrudRepository' {
   export interface AbstractCrudRepositoryInterface<T> {
     index(request: IndexRequest): Promise<any>
     show(id: string): Promise<T>
-    update({ id, body }: AbstractCrudRepositoryRequestUpdatePayload<T>): Promise<T>
+    update({ id, body }: RequestUpdatePayload<T>): Promise<T>
     destroy(id: string)
     getById(id: string)
     bulkInsert(items: Partial<T>[])
@@ -35,9 +37,9 @@ declare module '@ioc:AdonisCrud/Crud/AbstractCrudRepository' {
     store(propsToStore: Partial<T>): Promise<T>
   }
 
-  const AbstractCrudRepositoryService: {
+  const AbstractCrudRepository: {
     new <T>(model: LucidModel): AbstractCrudRepositoryInterface<T>
   }
 
-  export { AbstractCrudRepositoryService }
+  export { AbstractCrudRepository }
 }
