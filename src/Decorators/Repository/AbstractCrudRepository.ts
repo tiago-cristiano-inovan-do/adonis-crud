@@ -1,7 +1,6 @@
 import { LucidModel } from '@ioc:Adonis/Lucid/Orm'
-// import { QueryBuilder } from '@ioc:AdonisCrud/Crud/QueryBuilder'
+import { QueryBuilder } from '@ioc:AdonisCrud/Crud/QueryBuilder'
 import { DateTime } from 'luxon'
-import { QueryBuilder } from '../../QueryBuilder/QueryBuilder'
 
 export type QsRequest = {
   page?: number
