@@ -1,6 +1,8 @@
 {
   "exclude": [
-    "./templates"
+    "./templates",
+    "build",
+    "node_modules"
   ],
   "extends": "./node_modules/@adonisjs/mrm-preset/_tsconfig",
   "compilerOptions": {
