@@ -23,12 +23,12 @@ export type RequestUpdatePayload<T> = {
 
 export type GetByIdRequest = {
   id: string
-  status: boolean
+  status?: boolean
 }
 
 export interface IRepository<T> {
   index(request: IndexRequest<T>)
-  show(id: string): Promise<T>
+  show(id: string, status?: boolean): Promise<T>
   update({ id, body }: RequestUpdatePayload<T>): Promise<T>
   destroy(id)
   getById(id)
@@ -41,7 +41,7 @@ export abstract class AbstractCrudRepository<T> implements IRepository<T> {
   protected selecteFields: Array<string> = []
   constructor(private model: LucidModel) {}
 
-  public index({ qs: { ...rest } }: IndexRequest<T>): any {
+  public index({ qs: { ...rest } }: IndexRequest<T>): QueryBuilder {
     const query = QueryBuilder.build({
       model: this.model,
       qs: rest,
@@ -50,7 +50,7 @@ export abstract class AbstractCrudRepository<T> implements IRepository<T> {
     return query
   }
 
-  public async show(id: string, status = true): Promise<T> {
+  public async show(id: string, status?: boolean): Promise<T> {
     return this.getById({ id, status })
   }
 
